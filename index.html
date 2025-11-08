@@ -662,6 +662,50 @@
                     </div>
                 </div>
 
+                <!-- Employment Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Employment Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="provider-hire-date">Hire Date</label>
+                            <input type="date" id="provider-hire-date" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-employment-status">Employment Status</label>
+                            <select id="provider-employment-status" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <option value="Full-Time">Full-Time</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Per Diem">Per Diem</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Locum Tenens">Locum Tenens</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="provider-employment-notes">Employment Notes</label>
+                            <textarea id="provider-employment-notes" rows="2" placeholder="Additional employment details..." style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Practice Locations -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Practice Locations</h3>
+                        <button type="button" onclick="addProviderLocation()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Location
+                        </button>
+                    </div>
+                    <div id="provider-locations-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No practice locations assigned. Click "Add Location" to assign this provider to locations.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeProviderModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">

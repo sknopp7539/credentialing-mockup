@@ -1786,6 +1786,74 @@ function getProviderLicenses() {
     });
 }
 
+// Provider Location Management
+function addProviderLocation() {
+    const list = document.getElementById('provider-locations-list');
+    const id = Date.now();
+
+    // Get locations for current organization
+    const orgLocations = currentOrganization ?
+        locations.filter(loc => loc.organizationId === currentOrganization.id) :
+        locations;
+
+    if (orgLocations.length === 0) {
+        alert('No locations found for this organization. Please add locations first.');
+        return;
+    }
+
+    const locationHtml = `
+        <div id="provider-location-${id}" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: white; display: flex; gap: 0.75rem; align-items: center;">
+            <select class="provider-location-select" data-id="${id}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required>
+                <option value="">Select Location</option>
+                ${orgLocations.map(loc => `<option value="${loc.id}">${loc.name} - ${loc.city}, ${loc.state}</option>`).join('')}
+            </select>
+            <button type="button" onclick="removeProviderLocation(${id})" class="btn-danger btn-small">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    `;
+
+    if (providerLocations.length === 0) {
+        list.innerHTML = locationHtml;
+    } else {
+        list.insertAdjacentHTML('beforeend', locationHtml);
+    }
+
+    providerLocations.push({ id, locationId: '' });
+}
+
+function removeProviderLocation(id) {
+    const element = document.getElementById(`provider-location-${id}`);
+    if (element) {
+        element.remove();
+    }
+    providerLocations = providerLocations.filter(item => item.id !== id);
+
+    if (providerLocations.length === 0) {
+        const list = document.getElementById('provider-locations-list');
+        list.innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No practice locations assigned. Click "Add Location" to assign this provider to locations.
+            </p>
+        `;
+    }
+}
+
+function getProviderLocations() {
+    return providerLocations.map(loc => {
+        const locationId = document.querySelector(`.provider-location-select[data-id="${loc.id}"]`)?.value || '';
+        const location = locations.find(l => l.id === locationId);
+        return {
+            locationId,
+            locationName: location?.name || '',
+            isPrimary: false // Could add radio buttons to set primary location
+        };
+    }).filter(loc => loc.locationId); // Only return locations that were actually selected
+}
+
 function showProviderModal() {
     document.getElementById('provider-modal-title').textContent = 'Add Provider';
     document.getElementById('provider-form').reset();
@@ -1793,10 +1861,19 @@ function showProviderModal() {
 
     // Reset licenses
     providerLicenses = [];
-    const list = document.getElementById('provider-licenses-list');
-    list.innerHTML = `
+    const licenseList = document.getElementById('provider-licenses-list');
+    licenseList.innerHTML = `
         <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
             No licenses added. Click "Add License" to add state medical licenses.
+        </p>
+    `;
+
+    // Reset locations
+    providerLocations = [];
+    const locationsList = document.getElementById('provider-locations-list');
+    locationsList.innerHTML = `
+        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+            No practice locations assigned. Click "Add Location" to assign this provider to locations.
         </p>
     `;
 
@@ -1814,6 +1891,7 @@ function saveProvider(event) {
     const firstName = document.getElementById('provider-first-name').value;
     const lastName = document.getElementById('provider-last-name').value;
     const licenses = getProviderLicenses();
+    const practiceLocations = getProviderLocations();
 
     const providerData = {
         id: id || `PROV-${String(providers.length + 1).padStart(3, '0')}`,
@@ -1826,7 +1904,13 @@ function saveProvider(event) {
         phone: document.getElementById('provider-phone').value,
         status: document.getElementById('provider-status').value,
         organizationId: currentOrganization ? currentOrganization.id : null,
+        // Employment Information
+        hireDate: document.getElementById('provider-hire-date').value,
+        employmentStatus: document.getElementById('provider-employment-status').value,
+        employmentNotes: document.getElementById('provider-employment-notes').value,
+        // Licenses and Locations
         licenses: licenses,
+        practiceLocations: practiceLocations,
         archivedLicenses: [],
         payerEnrollments: [],
         documents: [],
@@ -1938,6 +2022,48 @@ function editProvider(id) {
         list.innerHTML = `
             <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
                 No licenses added. Click "Add License" to add state medical licenses.
+            </p>
+        `;
+    }
+
+    // Populate employment information
+    document.getElementById('provider-hire-date').value = provider.hireDate || '';
+    document.getElementById('provider-employment-status').value = provider.employmentStatus || 'Full-Time';
+    document.getElementById('provider-employment-notes').value = provider.employmentNotes || '';
+
+    // Populate practice locations
+    providerLocations = [];
+    const locationsList = document.getElementById('provider-locations-list');
+    locationsList.innerHTML = '';
+
+    if (provider.practiceLocations && provider.practiceLocations.length > 0) {
+        const orgLocations = currentOrganization ?
+            locations.filter(loc => loc.organizationId === currentOrganization.id) :
+            locations;
+
+        provider.practiceLocations.forEach(pracLoc => {
+            const locId = Date.now() + Math.random();
+            providerLocations.push({ id: locId, locationId: pracLoc.locationId });
+
+            locationsList.insertAdjacentHTML('beforeend', `
+                <div id="provider-location-${locId}" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: white; display: flex; gap: 0.75rem; align-items: center;">
+                    <select class="provider-location-select" data-id="${locId}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required>
+                        <option value="">Select Location</option>
+                        ${orgLocations.map(loc => `<option value="${loc.id}" ${loc.id === pracLoc.locationId ? 'selected' : ''}>${loc.name} - ${loc.city}, ${loc.state}</option>`).join('')}
+                    </select>
+                    <button type="button" onclick="removeProviderLocation(${locId})" class="btn-danger btn-small">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            `);
+        });
+    } else {
+        locationsList.innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No practice locations assigned. Click "Add Location" to assign this provider to locations.
             </p>
         `;
     }
