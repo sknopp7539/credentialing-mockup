@@ -114,6 +114,16 @@
                     </svg>
                     <span>Organizations</span>
                 </button>
+                <button class="nav-item" onclick="showView('claims')" data-view="claims">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                    </svg>
+                    <span>Claims</span>
+                </button>
                 <button class="nav-item" onclick="showView('analytics')" data-view="analytics">
                     <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -572,6 +582,78 @@
                                 </tr>
                             </thead>
                             <tbody id="notifications-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="claims-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Claims Management</h1>
+                        <p class="page-subtitle">Track and manage malpractice and liability claims</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showClaimModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Claim
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="position: relative; max-width: 400px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="claim-search" placeholder="Search claims by ID or provider..." style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;" oninput="filterClaims()">
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="filters-bar" style="margin-bottom: 1.5rem;">
+                    <div class="filter-group">
+                        <button class="filter-btn active" onclick="filterClaimsByStatus('all')">All</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('open')">Open</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('pending')">Pending</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('settled')">Settled</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('closed')">Closed</button>
+                    </div>
+                </div>
+
+                <!-- Claims Table -->
+                <div class="expirations-section">
+                    <div class="section-header">
+                        <h2>All Claims (<span id="claims-count">0</span>)</h2>
+                        <button class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Report
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Provider</th>
+                                    <th>Status</th>
+                                    <th>Reserve Amount</th>
+                                    <th>Settlement Amount</th>
+                                    <th>Incident Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="claims-list">
                                 <!-- Will be populated by JavaScript -->
                             </tbody>
                         </table>
@@ -1350,6 +1432,87 @@
         </div>
     </div>
 
-    <script src="app.js?v=3"></script>
+    <!-- Claim Modal -->
+    <div id="claim-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="claim-modal-title">Add Claim</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Track malpractice and liability claims
+                    </p>
+                </div>
+                <span class="close" onclick="closeClaimModal()">&times;</span>
+            </div>
+            <form id="claim-form" onsubmit="saveClaim(event)">
+                <input type="hidden" id="claim-edit-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="claim-id">Claim ID <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="claim-id" required placeholder="e.g., CLM-2024-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-provider">Provider <span style="color: #ef4444;">*</span></label>
+                            <select id="claim-provider" required>
+                                <option value="">Select Provider</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-status">Status <span style="color: #ef4444;">*</span></label>
+                            <select id="claim-status" required>
+                                <option value="open">Open</option>
+                                <option value="pending">Pending</option>
+                                <option value="settled">Settled</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-incident-date">Incident Date <span style="color: #ef4444;">*</span></label>
+                            <input type="date" id="claim-incident-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-reserve-amount">Reserve Amount ($)</label>
+                            <input type="number" id="claim-reserve-amount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-settlement-amount">Settlement Amount ($)</label>
+                            <input type="number" id="claim-settlement-amount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Details</h3>
+                    <div class="form-group">
+                        <label for="claim-description">Description</label>
+                        <textarea id="claim-description" rows="3" placeholder="Brief description of the claim..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="claim-notes">Notes</label>
+                        <textarea id="claim-notes" rows="3" placeholder="Additional notes or updates..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeClaimModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Save Claim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js?v=4"></script>
 </body>
 </html>

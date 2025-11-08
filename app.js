@@ -7,6 +7,7 @@ let locations = [];
 let contracts = [];
 let emailNotifications = [];
 let organizations = [];
+let claims = [];
 let currentOrganization = null;
 let currentUser = null;
 let selectedProvider = null;
@@ -23,6 +24,7 @@ let professionalReferences = [];
 let refreshTimer = 20;
 let refreshInterval = null;
 let currentNotificationFilter = 'all';
+let currentClaimFilter = 'all';
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
     loadContracts();
     loadEmailNotifications();
+    loadClaims();
 });
 
 // ===== AUTHENTICATION =====
@@ -115,6 +118,8 @@ function showView(viewName) {
         renderEnrollments();
     } else if (viewName === 'locations') {
         renderLocations();
+    } else if (viewName === 'claims') {
+        renderClaims();
     } else if (viewName === 'analytics') {
         renderAnalytics();
     } else if (viewName === 'email-notifications') {
@@ -988,15 +993,23 @@ function updateDashboard() {
         }) :
         enrollments;
 
+    // Filter claims by current organization
+    const orgClaims = currentOrganization ?
+        claims.filter(c => c.organizationId === currentOrganization.id) :
+        claims;
+
+    const openClaims = orgClaims.filter(c => c.status === 'open').length;
+
     console.log('   Providers in org:', orgProviders.length);
     console.log('   Enrollments in org:', orgEnrollments.length);
+    console.log('   Open claims in org:', openClaims);
 
     // Update stats
     document.getElementById('total-providers').textContent = orgProviders.length;
     document.getElementById('total-enrollments').textContent = orgEnrollments.length;
     document.getElementById('pending-credentialing').textContent =
         orgProviders.filter(p => p.status === 'Pending').length;
-    document.getElementById('open-claims').textContent = '0'; // Calculate based on org data
+    document.getElementById('open-claims').textContent = openClaims;
 
     // Populate expirations table
     renderExpirationsTable();
@@ -4304,3 +4317,304 @@ showView = function(viewName) {
     }
     originalShowView(viewName);
 };
+
+// ===== CLAIMS MANAGEMENT =====
+function loadClaims() {
+    const storedClaims = localStorage.getItem('pvClaims');
+    if (storedClaims) {
+        claims = JSON.parse(storedClaims);
+    } else {
+        // Sample claims data
+        claims = [
+            {
+                id: 'CLM-2024-001',
+                claimId: 'CLM-2024-001',
+                providerId: 'PROV-001',
+                organizationId: 'ORG-001',
+                status: 'open',
+                reserveAmount: 50000,
+                settlementAmount: 0,
+                incidentDate: '2024-01-15',
+                description: 'Alleged surgical complication',
+                notes: 'Investigation ongoing',
+                createdAt: '2024-01-20'
+            },
+            {
+                id: 'CLM-2024-002',
+                claimId: 'CLM-2024-002',
+                providerId: 'PROV-002',
+                organizationId: 'ORG-001',
+                status: 'pending',
+                reserveAmount: 75000,
+                settlementAmount: 0,
+                incidentDate: '2024-02-10',
+                description: 'Medication error claim',
+                notes: 'Awaiting legal review',
+                createdAt: '2024-02-15'
+            },
+            {
+                id: 'CLM-2023-045',
+                claimId: 'CLM-2023-045',
+                providerId: 'PROV-008',
+                organizationId: 'ORG-002',
+                status: 'settled',
+                reserveAmount: 100000,
+                settlementAmount: 45000,
+                incidentDate: '2023-11-05',
+                description: 'Diagnostic delay claim',
+                notes: 'Settled out of court',
+                createdAt: '2023-11-10'
+            }
+        ];
+        saveClaims();
+    }
+}
+
+function saveClaims() {
+    localStorage.setItem('pvClaims', JSON.stringify(claims));
+}
+
+function renderClaims() {
+    console.log('📋 Rendering claims...');
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
+
+    const claimsList = document.getElementById('claims-list');
+    if (!claimsList) return;
+
+    // Filter claims by current organization
+    const orgClaims = currentOrganization ?
+        claims.filter(c => c.organizationId === currentOrganization.id) :
+        claims;
+
+    console.log('   Claims in current org:', orgClaims.length);
+
+    // Apply status filter
+    const filteredClaims = currentClaimFilter === 'all' ?
+        orgClaims :
+        orgClaims.filter(c => c.status === currentClaimFilter);
+
+    // Update count
+    const countElement = document.getElementById('claims-count');
+    if (countElement) {
+        countElement.textContent = filteredClaims.length;
+    }
+
+    if (filteredClaims.length === 0) {
+        claimsList.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem; color: #94a3b8;">
+                    ${currentOrganization ?
+                        `No claims found for ${currentOrganization.name}` :
+                        'No claims found'}
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    claimsList.innerHTML = filteredClaims.map(claim => {
+        const provider = providers.find(p => p.id === claim.providerId);
+        const providerName = provider ?
+            `${provider.firstName || ''} ${provider.lastName || ''}`.trim() || provider.name || 'Unknown' :
+            'Unknown Provider';
+
+        const statusBadge = getClaimStatusBadge(claim.status);
+        const reserveFormatted = claim.reserveAmount ? `$${claim.reserveAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '-';
+        const settlementFormatted = claim.settlementAmount ? `$${claim.settlementAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '-';
+        const incidentDate = claim.incidentDate ? new Date(claim.incidentDate).toLocaleDateString() : '-';
+
+        return `
+            <tr>
+                <td style="font-weight: 600;">${claim.claimId}</td>
+                <td>${providerName}</td>
+                <td>${statusBadge}</td>
+                <td>${reserveFormatted}</td>
+                <td>${settlementFormatted}</td>
+                <td>${incidentDate}</td>
+                <td>
+                    <button class="btn btn-secondary btn-small" onclick='editClaim(${JSON.stringify(claim)})'>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function getClaimStatusBadge(status) {
+    const badges = {
+        'open': '<span class="badge" style="background: #fee2e2; color: #991b1b;">Open</span>',
+        'pending': '<span class="badge" style="background: #fef3c7; color: #92400e;">Pending</span>',
+        'settled': '<span class="badge" style="background: #d1fae5; color: #065f46;">Settled</span>',
+        'closed': '<span class="badge" style="background: #e0e7ff; color: #3730a3;">Closed</span>'
+    };
+    return badges[status] || `<span class="badge">${status}</span>`;
+}
+
+function filterClaimsByStatus(status) {
+    console.log('Filtering claims by status:', status);
+    currentClaimFilter = status;
+
+    // Update active filter button
+    document.querySelectorAll('.filter-group .filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    renderClaims();
+}
+
+function filterClaims() {
+    const searchTerm = document.getElementById('claim-search')?.value.toLowerCase() || '';
+    const claimsList = document.getElementById('claims-list');
+    if (!claimsList) return;
+
+    const rows = claimsList.querySelectorAll('tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+}
+
+function showClaimModal() {
+    console.log('Opening claim modal for new claim');
+
+    // Reset form
+    document.getElementById('claim-edit-id').value = '';
+    document.getElementById('claim-id').value = '';
+    document.getElementById('claim-id').disabled = false;
+    document.getElementById('claim-provider').value = '';
+    document.getElementById('claim-status').value = 'open';
+    document.getElementById('claim-incident-date').value = '';
+    document.getElementById('claim-reserve-amount').value = '';
+    document.getElementById('claim-settlement-amount').value = '';
+    document.getElementById('claim-description').value = '';
+    document.getElementById('claim-notes').value = '';
+
+    // Populate provider dropdown with current org's providers
+    const providerSelect = document.getElementById('claim-provider');
+    const orgProviders = currentOrganization ?
+        providers.filter(p => p.organizationId === currentOrganization.id) :
+        providers;
+
+    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
+        orgProviders.map(p => {
+            const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
+            return `<option value="${p.id}">${name}</option>`;
+        }).join('');
+
+    // Update modal title
+    document.getElementById('claim-modal-title').textContent = 'Add Claim';
+
+    // Show modal
+    document.getElementById('claim-modal').style.display = 'flex';
+}
+
+function editClaim(claim) {
+    console.log('Editing claim:', claim);
+
+    // Populate form with claim data
+    document.getElementById('claim-edit-id').value = claim.id;
+    document.getElementById('claim-id').value = claim.claimId;
+    document.getElementById('claim-id').disabled = true; // Don't allow changing claim ID
+    document.getElementById('claim-provider').value = claim.providerId;
+    document.getElementById('claim-status').value = claim.status;
+    document.getElementById('claim-incident-date').value = claim.incidentDate || '';
+    document.getElementById('claim-reserve-amount').value = claim.reserveAmount || '';
+    document.getElementById('claim-settlement-amount').value = claim.settlementAmount || '';
+    document.getElementById('claim-description').value = claim.description || '';
+    document.getElementById('claim-notes').value = claim.notes || '';
+
+    // Populate provider dropdown with current org's providers
+    const providerSelect = document.getElementById('claim-provider');
+    const orgProviders = currentOrganization ?
+        providers.filter(p => p.organizationId === currentOrganization.id) :
+        providers;
+
+    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
+        orgProviders.map(p => {
+            const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
+            return `<option value="${p.id}">${name}</option>`;
+        }).join('');
+
+    // Set selected provider
+    document.getElementById('claim-provider').value = claim.providerId;
+
+    // Update modal title
+    document.getElementById('claim-modal-title').textContent = 'Edit Claim';
+
+    // Show modal
+    document.getElementById('claim-modal').style.display = 'flex';
+}
+
+function closeClaimModal() {
+    document.getElementById('claim-modal').style.display = 'none';
+}
+
+function saveClaim(event) {
+    event.preventDefault();
+
+    const editId = document.getElementById('claim-edit-id').value;
+    const claimId = document.getElementById('claim-id').value;
+    const providerId = document.getElementById('claim-provider').value;
+    const status = document.getElementById('claim-status').value;
+    const incidentDate = document.getElementById('claim-incident-date').value;
+    const reserveAmount = parseFloat(document.getElementById('claim-reserve-amount').value) || 0;
+    const settlementAmount = parseFloat(document.getElementById('claim-settlement-amount').value) || 0;
+    const description = document.getElementById('claim-description').value;
+    const notes = document.getElementById('claim-notes').value;
+
+    if (!currentOrganization) {
+        alert('Please select an organization first');
+        return;
+    }
+
+    if (editId) {
+        // Update existing claim
+        const claimIndex = claims.findIndex(c => c.id === editId);
+        if (claimIndex !== -1) {
+            claims[claimIndex] = {
+                ...claims[claimIndex],
+                providerId,
+                status,
+                incidentDate,
+                reserveAmount,
+                settlementAmount,
+                description,
+                notes
+            };
+            console.log('Updated claim:', claims[claimIndex]);
+        }
+    } else {
+        // Create new claim
+        const newClaim = {
+            id: claimId,
+            claimId,
+            providerId,
+            organizationId: currentOrganization.id,
+            status,
+            incidentDate,
+            reserveAmount,
+            settlementAmount,
+            description,
+            notes,
+            createdAt: new Date().toISOString()
+        };
+        claims.push(newClaim);
+        console.log('Created new claim:', newClaim);
+    }
+
+    saveClaims();
+    closeClaimModal();
+    renderClaims();
+
+    // Update dashboard if visible
+    const dashboardView = document.getElementById('dashboard-view');
+    if (dashboardView && dashboardView.classList.contains('active')) {
+        updateDashboard();
+    }
+}
