@@ -592,6 +592,7 @@ function loadProviders() {
                 state: 'CA',
                 email: 'sarah.johnson@hospital.com',
                 phone: '(555) 123-4567',
+                locationId: 'LOC-001',
                 status: 'Active'
             },
             {
@@ -603,6 +604,7 @@ function loadProviders() {
                 state: 'NY',
                 email: 'michael.chen@clinic.com',
                 phone: '(555) 987-6543',
+                locationId: 'LOC-002',
                 status: 'Active'
             }
         ];
@@ -627,7 +629,10 @@ function renderProviders() {
         return;
     }
 
-    container.innerHTML = providers.map(provider => `
+    container.innerHTML = providers.map(provider => {
+        const location = locations.find(l => l.id === provider.locationId);
+
+        return `
         <div class="provider-card">
             <div class="card-header">
                 <span class="card-id">${provider.id}</span>
@@ -644,6 +649,16 @@ function renderProviders() {
                     <span class="detail-label">License:</span>
                     <span class="detail-value">${provider.license} (${provider.state})</span>
                 </div>
+                ${location ? `
+                <div class="card-detail">
+                    <span class="detail-label">Location:</span>
+                    <span class="detail-value">${location.name}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Address:</span>
+                    <span class="detail-value">${location.city}, ${location.state}</span>
+                </div>
+                ` : ''}
                 <div class="card-detail">
                     <span class="detail-label">Email:</span>
                     <span class="detail-value">${provider.email}</span>
@@ -658,13 +673,21 @@ function renderProviders() {
                 <button class="btn btn-danger btn-small" onclick="deleteProvider('${provider.id}')">Delete</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+function populateProviderLocationDropdown() {
+    const locationSelect = document.getElementById('provider-location');
+    locationSelect.innerHTML = '<option value="">Select Location</option>' +
+        locations.map(l => `<option value="${l.id}">${l.name} - ${l.city}, ${l.state}</option>`).join('');
 }
 
 function showProviderModal() {
     document.getElementById('provider-modal-title').textContent = 'Add Provider';
     document.getElementById('provider-form').reset();
     document.getElementById('provider-edit-id').value = '';
+    populateProviderLocationDropdown();
     document.getElementById('provider-modal').classList.add('active');
 }
 
@@ -685,6 +708,7 @@ function saveProvider(event) {
         state: document.getElementById('provider-state').value,
         email: document.getElementById('provider-email').value,
         phone: document.getElementById('provider-phone').value,
+        locationId: document.getElementById('provider-location').value,
         status: document.getElementById('provider-status').value
     };
 
@@ -715,6 +739,8 @@ function editProvider(id) {
     document.getElementById('provider-state').value = provider.state;
     document.getElementById('provider-email').value = provider.email;
     document.getElementById('provider-phone').value = provider.phone;
+    populateProviderLocationDropdown();
+    document.getElementById('provider-location').value = provider.locationId || '';
     document.getElementById('provider-status').value = provider.status;
 
     document.getElementById('provider-modal').classList.add('active');
