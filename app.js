@@ -1710,12 +1710,12 @@ function addProviderLicense() {
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">State <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="license-state" data-id="${id}" placeholder="e.g., NY" maxlength="2" style="text-transform: uppercase; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">State</label>
+                    <input type="text" class="license-state" data-id="${id}" placeholder="e.g., NY" maxlength="2" style="text-transform: uppercase; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">License Number <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="license-number" data-id="${id}" placeholder="License number" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">License Number</label>
+                    <input type="text" class="license-number" data-id="${id}" placeholder="License number" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
                     <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Issue Date</label>
@@ -1807,7 +1807,7 @@ function addProviderLocation() {
 
     const locationHtml = `
         <div id="provider-location-${id}" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: white; display: flex; gap: 0.75rem; align-items: center;">
-            <select class="provider-location-select" data-id="${id}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required>
+            <select class="provider-location-select" data-id="${id}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
                 <option value="">Select Location</option>
                 ${orgLocations.map(loc => `<option value="${loc.id}">${loc.name} - ${loc.city}, ${loc.state}</option>`).join('')}
             </select>
@@ -1877,8 +1877,8 @@ function addHospitalAffiliation() {
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group" style="grid-column: span 2;">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Hospital Name <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="affiliation-hospital" data-id="${id}" placeholder="e.g., Memorial Hospital" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Hospital Name</label>
+                    <input type="text" class="affiliation-hospital" data-id="${id}" placeholder="e.g., Memorial Hospital" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
                     <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Privilege Type</label>
@@ -1960,8 +1960,8 @@ function addCredentialingContact() {
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Organization <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="contact-org" data-id="${id}" placeholder="e.g., State Medical Board" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Organization</label>
+                    <input type="text" class="contact-org" data-id="${id}" placeholder="e.g., State Medical Board" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
                     <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Contact Name</label>
@@ -2029,8 +2029,8 @@ function addLiabilityInsurance() {
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Insurance Carrier <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="policy-carrier" data-id="${id}" placeholder="e.g., ABC Insurance Co." style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Insurance Carrier</label>
+                    <input type="text" class="policy-carrier" data-id="${id}" placeholder="e.g., ABC Insurance Co." style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
                     <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Policy Number</label>
@@ -2111,8 +2111,8 @@ function addProfessionalReference() {
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
                 <div class="form-group">
-                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Name <span style="color: #ef4444;">*</span></label>
-                    <input type="text" class="reference-name" data-id="${id}" placeholder="Reference name" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Name</label>
+                    <input type="text" class="reference-name" data-id="${id}" placeholder="Reference name" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
                 </div>
                 <div class="form-group">
                     <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Title/Specialty</label>
@@ -2235,16 +2235,31 @@ function closeProviderModal() {
 
 function saveProvider(event) {
     event.preventDefault();
+    console.log('Save provider called');
 
-    const id = document.getElementById('provider-edit-id').value;
-    const firstName = document.getElementById('provider-first-name').value;
-    const lastName = document.getElementById('provider-last-name').value;
-    const licenses = getProviderLicenses();
-    const practiceLocations = getProviderLocations();
-    const affiliations = getHospitalAffiliations();
-    const contacts = getCredentialingContacts();
-    const insurancePolicies = getLiabilityInsurance();
-    const references = getProfessionalReferences();
+    try {
+        const id = document.getElementById('provider-edit-id').value;
+        const firstName = document.getElementById('provider-first-name').value;
+        const lastName = document.getElementById('provider-last-name').value;
+        console.log('Basic info collected:', firstName, lastName);
+
+        const licenses = getProviderLicenses();
+        console.log('Licenses:', licenses);
+
+        const practiceLocations = getProviderLocations();
+        console.log('Locations:', practiceLocations);
+
+        const affiliations = getHospitalAffiliations();
+        console.log('Affiliations:', affiliations);
+
+        const contacts = getCredentialingContacts();
+        console.log('Contacts:', contacts);
+
+        const insurancePolicies = getLiabilityInsurance();
+        console.log('Insurance:', insurancePolicies);
+
+        const references = getProfessionalReferences();
+        console.log('References:', references);
 
     const providerData = {
         id: id || `PROV-${String(providers.length + 1).padStart(3, '0')}`,
@@ -2302,9 +2317,21 @@ function saveProvider(event) {
         providers.push(providerData);
     }
 
-    saveProviders();
-    renderProviders();
-    closeProviderModal();
+        console.log('Provider data prepared:', providerData);
+
+        saveProviders();
+        console.log('Providers saved to localStorage');
+
+        renderProviders();
+        console.log('Providers rendered');
+
+        closeProviderModal();
+        console.log('Modal closed, save complete!');
+
+    } catch (error) {
+        console.error('Error saving provider:', error);
+        alert('Error saving provider: ' + error.message);
+    }
 }
 
 function editProvider(id) {
@@ -2416,7 +2443,7 @@ function editProvider(id) {
 
             locationsList.insertAdjacentHTML('beforeend', `
                 <div id="provider-location-${locId}" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: white; display: flex; gap: 0.75rem; align-items: center;">
-                    <select class="provider-location-select" data-id="${locId}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required>
+                    <select class="provider-location-select" data-id="${locId}" style="flex: 1; padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
                         <option value="">Select Location</option>
                         ${orgLocations.map(loc => `<option value="${loc.id}" ${loc.id === pracLoc.locationId ? 'selected' : ''}>${loc.name} - ${loc.city}, ${loc.state}</option>`).join('')}
                     </select>
