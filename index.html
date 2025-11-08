@@ -1,1 +1,1521 @@
-<!doctype html><meta charset="utf-8"><title>It works</title><h1>It works!</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>ProviderVault - Healthcare Credentialing System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="auth-screen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <div class="logo-icon">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                        <rect width="40" height="40" rx="8" fill="#06b6d4"/>
+                        <path d="M20 10L28 15V25C28 29 20 32 20 32C20 32 12 29 12 25V15L20 10Z" stroke="white" stroke-width="2" fill="none"/>
+                    </svg>
+                </div>
+                <h1>ProviderVault</h1>
+                <p>Healthcare Credentialing Management System</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <form onsubmit="login(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required placeholder="Enter your email" value="admin@providervault.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="Enter your password" value="demo123">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                    <p class="demo-info">Demo credentials: admin@providervault.com / demo123</p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="8" fill="#06b6d4"/>
+                            <path d="M20 10L28 15V25C28 29 20 32 20 32C20 32 12 29 12 25V15L20 10Z" stroke="white" stroke-width="2" fill="none"/>
+                        </svg>
+                    </div>
+                    <span class="logo-text">ProviderVault</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="showView('dashboard')" data-view="dashboard">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" onclick="showView('providers')" data-view="providers">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Providers</span>
+                </button>
+                <button class="nav-item" onclick="showView('credentialing')" data-view="credentialing">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Credentialing</span>
+                </button>
+                <button class="nav-item" onclick="showView('enrollments')" data-view="enrollments">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    <span>Enrollments</span>
+                </button>
+                <button class="nav-item" onclick="showView('payers')" data-view="payers">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    <span>Payer Contracts</span>
+                </button>
+                <button class="nav-item" onclick="showView('locations')" data-view="locations">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span>Locations</span>
+                </button>
+                <button class="nav-item" onclick="showView('organizations')" data-view="organizations">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span>Organizations</span>
+                </button>
+                <button class="nav-item" onclick="showView('claims')" data-view="claims">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
+                    </svg>
+                    <span>Claims</span>
+                </button>
+                <button class="nav-item" onclick="showView('analytics')" data-view="analytics">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-item" onclick="showView('email-notifications')" data-view="email-notifications">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span>Email Notifications</span>
+                </button>
+                <button class="nav-item" onclick="showView('settings')" data-view="settings">
+                    <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3M18.36 5.64l-4.24 4.24M9.88 14.12l-4.24 4.24M18.36 18.36l-4.24-4.24M9.88 9.88L5.64 5.64"></path>
+                    </svg>
+                    <span>Settings</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div class="search-bar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" placeholder="Search providers... (⌘K)">
+                </div>
+                <div style="position: relative;">
+                    <button onclick="toggleOrgDropdown()" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-size: 0.875rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #06b6d4;">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span id="current-org-name" style="font-weight: 500; color: #1e293b;">Loading...</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #64748b;">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+                    <div id="org-dropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); min-width: 300px; max-height: 400px; overflow-y: auto; z-index: 1000;"></div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="icon-btn" id="notifications-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="user-menu">
+                        <div class="user-avatar">JD</div>
+                        <div class="user-info-small">
+                            <div id="current-user-name" class="user-name-small">Admin User</div>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Total Providers</span>
+                        </div>
+                        <div class="stat-value" id="total-providers">16</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Total Enrollments</span>
+                        </div>
+                        <div class="stat-value" id="total-enrollments">20</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Pending Credentialing</span>
+                        </div>
+                        <div class="stat-value" id="pending-credentialing">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Open Claims</span>
+                        </div>
+                        <div class="stat-value" id="open-claims">1</div>
+                    </div>
+                </div>
+
+                <!-- Widgets Grid -->
+                <div class="widgets-grid">
+                    <!-- Quick Actions -->
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="action-item" onclick="showView('providers')">
+                                <div class="action-title">Manage Providers</div>
+                                <div class="action-desc">Add or update provider information</div>
+                            </button>
+                            <button class="action-item" onclick="showView('credentialing')">
+                                <div class="action-title">Credentialing Pipeline</div>
+                                <div class="action-desc">Track verification progress</div>
+                            </button>
+                            <button class="action-item" onclick="showView('enrollments')">
+                                <div class="action-title">Enrollments</div>
+                                <div class="action-desc">Manage payer enrollments</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3>System Status</h3>
+                        </div>
+                        <div class="status-list">
+                            <div class="status-item">
+                                <span>Database</span>
+                                <div class="status-indicator">
+                                    <span class="status-dot active"></span>
+                                    <span class="status-text">Connected</span>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <span>Authentication</span>
+                                <div class="status-indicator">
+                                    <span class="status-dot active"></span>
+                                    <span class="status-text">Active</span>
+                                </div>
+                            </div>
+                            <div class="status-item">
+                                <span>Storage</span>
+                                <div class="status-indicator">
+                                    <span class="status-dot active"></span>
+                                    <span class="status-text">Available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="widget-card">
+                        <div class="widget-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-empty">
+                            <p>Activity tracking will appear here as you use the system.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Expirations -->
+                <div class="expirations-section">
+                    <div class="section-header">
+                        <h2>Upcoming Expirations</h2>
+                        <button class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Report
+                        </button>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterExpirations('all')">All</button>
+                            <button class="filter-btn" onclick="filterExpirations('today')">Upcoming (Today)</button>
+                            <button class="filter-btn" onclick="filterExpirations('30days')">Upcoming (30 days)</button>
+                            <button class="filter-btn" onclick="filterExpirations('60days')">At Expiration (60 days)</button>
+                        </div>
+                        <div class="tag-group">
+                            <span class="tag-label">Tags:</span>
+                            <button class="tag active" onclick="filterByTag('all')">All</button>
+                            <button class="tag tag-urgent" onclick="filterByTag('urgent')">Urgent</button>
+                            <button class="tag tag-warning" onclick="filterByTag('warning')">Warning</button>
+                            <button class="tag tag-upcoming" onclick="filterByTag('upcoming')">Upcoming</button>
+                        </div>
+                    </div>
+
+                    <!-- Expirations Table -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Document</th>
+                                    <th>Category</th>
+                                    <th>Expires In</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expirations-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Providers View -->
+            <div id="providers-view" class="view">
+                <div class="page-header">
+                    <h1>Providers</h1>
+                    <button class="btn btn-primary" onclick="showProviderModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Provider
+                    </button>
+                </div>
+                <div class="providers-grid" id="providers-list"></div>
+            </div>
+
+            <!-- Provider Detail View -->
+            <div id="provider-detail-view" class="view"></div>
+
+            <!-- Analytics View -->
+            <div id="analytics-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Analytics & Reporting</h1>
+                        <p class="page-subtitle">Gain insights into your credentialing and performance metrics</p>
+                    </div>
+                    <button class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Export Report
+                    </button>
+                </div>
+                <div id="analytics-content"></div>
+            </div>
+
+            <!-- Other Views (placeholder) -->
+            <div id="credentialing-view" class="view">
+                <div class="page-header">
+                    <h1>Credentialing</h1>
+                </div>
+                <div class="coming-soon">Credentialing management coming soon...</div>
+            </div>
+
+            <div id="enrollments-view" class="view">
+                <div class="page-header">
+                    <h1>Provider Enrollments</h1>
+                    <button class="btn btn-primary" onclick="showEnrollmentModal()">Add Enrollment</button>
+                </div>
+                <div class="enrollments-grid" id="enrollments-list"></div>
+            </div>
+
+            <div id="payers-view" class="view">
+                <div class="page-header">
+                    <h1>Payer/Insurance Management</h1>
+                    <button class="btn btn-primary" onclick="showPayerModal()">Add Payer</button>
+                </div>
+                <div class="payers-grid" id="payers-list"></div>
+            </div>
+
+            <div id="locations-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Locations</h1>
+                        <p class="page-subtitle">Manage facilities and practice locations</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showLocationModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Location
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="position: relative; max-width: 400px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="location-search" placeholder="Search locations..." style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;" oninput="filterLocations()">
+                    </div>
+                </div>
+
+                <!-- Locations Table -->
+                <div class="expirations-section">
+                    <div class="section-header">
+                        <h2>All Locations (<span id="locations-count">0</span>)</h2>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>NPI</th>
+                                    <th>Tax ID</th>
+                                    <th>City, State</th>
+                                    <th>Phone</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="locations-list">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="organizations-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Organizations</h1>
+                        <p class="page-subtitle">Manage healthcare organizations and facilities</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showOrganizationModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Organization
+                    </button>
+                </div>
+                <div class="providers-grid" id="organizations-list"></div>
+            </div>
+
+            <div id="email-notifications-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Email Notifications</h1>
+                        <p class="page-subtitle">Monitor automated credential expiration notifications and email delivery status</p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #f1f5f9; border-radius: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span style="font-size: 0.875rem; color: #64748b;">Next check in: <span id="refresh-timer" style="font-weight: 600; color: #1e293b;">20s</span></span>
+                        </div>
+                        <button class="btn btn-primary" onclick="runEmailCheck()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="1 4 1 10 7 10"></polyline>
+                                <polyline points="23 20 23 14 17 14"></polyline>
+                                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                            </svg>
+                            Run Check
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Total Notifications</span>
+                        </div>
+                        <div class="stat-value" id="total-notifications">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Sent Successfully</span>
+                        </div>
+                        <div class="stat-value" style="color: #10b981;" id="sent-notifications">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Pending</span>
+                        </div>
+                        <div class="stat-value" style="color: #f59e0b;" id="pending-notifications">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">Failed</span>
+                        </div>
+                        <div class="stat-value" style="color: #ef4444;" id="failed-notifications">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-label">No Email on File</span>
+                        </div>
+                        <div class="stat-value" style="color: #64748b;" id="noemail-notifications">0</div>
+                    </div>
+                </div>
+
+                <!-- Notification History -->
+                <div class="expirations-section">
+                    <div class="section-header">
+                        <h2>Notification History</h2>
+                        <button class="btn btn-secondary btn-small" onclick="exportNotificationsToCSV()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export CSV
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="filters-bar">
+                        <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+                            <div style="flex: 1; max-width: 400px; position: relative;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <path d="m21 21-4.35-4.35"></path>
+                                </svg>
+                                <input type="text" id="notification-search" placeholder="Search by provider name or email..." style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;" oninput="filterNotifications()">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterNotificationsByStatus('all')">All</button>
+                            <button class="filter-btn" onclick="filterNotificationsByStatus('Sent')">Sent</button>
+                            <button class="filter-btn" onclick="filterNotificationsByStatus('Pending')">Pending</button>
+                            <button class="filter-btn" onclick="filterNotificationsByStatus('Failed')">Failed</button>
+                            <button class="filter-btn" onclick="filterNotificationsByStatus('No Email')">No Email</button>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Table -->
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Email</th>
+                                    <th>Credential Type</th>
+                                    <th>Days Until Expiration</th>
+                                    <th>Sent Date/Time</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notifications-tbody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="claims-view" class="view">
+                <div class="page-header">
+                    <div>
+                        <h1>Claims Management</h1>
+                        <p class="page-subtitle">Track and manage malpractice and liability claims</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="showClaimModal()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Claim
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="position: relative; max-width: 400px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="claim-search" placeholder="Search claims by ID or provider..." style="width: 100%; padding: 0.75rem 0.75rem 0.75rem 2.5rem; border: 1px solid #e2e8f0; border-radius: 8px; outline: none;" oninput="filterClaims()">
+                    </div>
+                </div>
+
+                <!-- Filter Buttons -->
+                <div class="filters-bar" style="margin-bottom: 1.5rem;">
+                    <div class="filter-group">
+                        <button class="filter-btn active" onclick="filterClaimsByStatus('all')">All</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('open')">Open</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('pending')">Pending</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('settled')">Settled</button>
+                        <button class="filter-btn" onclick="filterClaimsByStatus('closed')">Closed</button>
+                    </div>
+                </div>
+
+                <!-- Claims Table -->
+                <div class="expirations-section">
+                    <div class="section-header">
+                        <h2>All Claims (<span id="claims-count">0</span>)</h2>
+                        <button class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Report
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Claim ID</th>
+                                    <th>Provider</th>
+                                    <th>Status</th>
+                                    <th>Reserve Amount</th>
+                                    <th>Settlement Amount</th>
+                                    <th>Incident Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="claims-list">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings-view" class="view">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="coming-soon">Settings configuration coming soon...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals (reusing existing modals with minor updates) -->
+    <!-- Provider Modal -->
+    <div id="provider-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="provider-modal-title">Add Provider</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Add comprehensive provider information including licenses and credentials
+                    </p>
+                </div>
+                <span class="close" onclick="closeProviderModal()">&times;</span>
+            </div>
+            <form id="provider-form" onsubmit="saveProvider(event)">
+                <input type="hidden" id="provider-edit-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="provider-first-name">First Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="provider-first-name" required placeholder="e.g., Sarah">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-last-name">Last Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="provider-last-name" required placeholder="e.g., Johnson">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-npi">NPI Number <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="provider-npi" required placeholder="10-digit NPI">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-specialty">Specialty <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="provider-specialty" required placeholder="e.g., Family Medicine">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-email">Email <span style="color: #ef4444;">*</span></label>
+                            <input type="email" id="provider-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-phone">Phone <span style="color: #ef4444;">*</span></label>
+                            <input type="tel" id="provider-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-status">Status <span style="color: #ef4444;">*</span></label>
+                            <select id="provider-status" required>
+                                <option value="Active">Active</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- State Licenses -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">State Licenses</h3>
+                        <button type="button" onclick="addProviderLicense()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add License
+                        </button>
+                    </div>
+                    <div id="provider-licenses-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No licenses added. Click "Add License" to add state medical licenses.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Employment Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Employment Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="provider-hire-date">Hire Date</label>
+                            <input type="date" id="provider-hire-date" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-employment-status">Employment Status</label>
+                            <select id="provider-employment-status" style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <option value="Full-Time">Full-Time</option>
+                                <option value="Part-Time">Part-Time</option>
+                                <option value="Per Diem">Per Diem</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Locum Tenens">Locum Tenens</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="provider-employment-notes">Employment Notes</label>
+                            <textarea id="provider-employment-notes" rows="2" placeholder="Additional employment details..." style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Practice Locations -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Practice Locations</h3>
+                        <button type="button" onclick="addProviderLocation()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Location
+                        </button>
+                    </div>
+                    <div id="provider-locations-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No practice locations assigned. Click "Add Location" to assign this provider to locations.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Hospital Affiliations -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Hospital Affiliations & Privileges</h3>
+                        <button type="button" onclick="addHospitalAffiliation()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Affiliation
+                        </button>
+                    </div>
+                    <div id="hospital-affiliations-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No hospital affiliations added. Click "Add Affiliation" to track hospital privileges.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Credentialing Contacts -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Credentialing Contacts</h3>
+                        <button type="button" onclick="addCredentialingContact()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Contact
+                        </button>
+                    </div>
+                    <div id="credentialing-contacts-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No credentialing contacts added. Click "Add Contact" to add primary source verification contacts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Professional Liability Insurance -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Professional Liability Insurance</h3>
+                        <button type="button" onclick="addLiabilityInsurance()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Policy
+                        </button>
+                    </div>
+                    <div id="liability-insurance-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No liability insurance policies added. Click "Add Policy" to track malpractice coverage.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Professional References -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Professional References</h3>
+                        <button type="button" onclick="addProfessionalReference()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Reference
+                        </button>
+                    </div>
+                    <div id="professional-references-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No professional references added. Click "Add Reference" to add reference contacts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Disclosures -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Disclosures & Attestations</h3>
+                    <div style="background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-sanctions-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any sanctions, disciplinary actions, or restrictions on medical license?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-malpractice-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any malpractice claims or settlements in the past 10 years?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-felony-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any felony convictions?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-disclosures-notes">Disclosure Details</label>
+                            <textarea id="provider-disclosures-notes" rows="3" placeholder="If any disclosures were checked, provide details here..." style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeProviderModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Save Provider
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enrollment Modal -->
+    <div id="enrollment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="enrollment-modal-title">Add Enrollment</h2>
+                <span class="close" onclick="closeEnrollmentModal()">&times;</span>
+            </div>
+            <form id="enrollment-form" onsubmit="saveEnrollment(event)">
+                <input type="hidden" id="enrollment-edit-id">
+                <div class="form-group">
+                    <label for="enrollment-provider">Provider *</label>
+                    <select id="enrollment-provider" required>
+                        <option value="">Select Provider</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="enrollment-payer">Payer *</label>
+                    <select id="enrollment-payer" required>
+                        <option value="">Select Payer</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="enrollment-application-date">Application Date *</label>
+                    <input type="date" id="enrollment-application-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="enrollment-status">Status *</label>
+                    <select id="enrollment-status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Denied">Denied</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEnrollmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payer Modal -->
+    <div id="payer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="payer-modal-title">Add Payer</h2>
+                <span class="close" onclick="closePayerModal()">&times;</span>
+            </div>
+            <form id="payer-form" onsubmit="savePayer(event)">
+                <input type="hidden" id="payer-edit-id">
+                <div class="form-group">
+                    <label for="payer-name">Payer Name *</label>
+                    <input type="text" id="payer-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="payer-type">Payer Type *</label>
+                    <select id="payer-type" required>
+                        <option value="">Select Type</option>
+                        <option value="Commercial">Commercial Insurance</option>
+                        <option value="Medicare">Medicare</option>
+                        <option value="Medicaid">Medicaid</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="payer-id">Payer ID *</label>
+                    <input type="text" id="payer-id" required>
+                </div>
+                <div class="form-group">
+                    <label for="payer-status">Status *</label>
+                    <select id="payer-status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePayerModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Location Modal -->
+    <div id="location-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="location-modal-title">Add Location</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Add a new facility or practice location
+                    </p>
+                </div>
+                <span class="close" onclick="closeLocationModal()">&times;</span>
+            </div>
+            <form id="location-form" onsubmit="saveLocation(event)">
+                <input type="hidden" id="location-edit-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="location-name">Location Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-name" required placeholder="e.g., Main Medical Center">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-type">Type <span style="color: #ef4444;">*</span></label>
+                            <select id="location-type" required>
+                                <option value="">Select Type</option>
+                                <option value="Hospital">Hospital</option>
+                                <option value="Clinic">Clinic</option>
+                                <option value="Office">Office</option>
+                                <option value="Surgical Center">Surgical Center</option>
+                                <option value="Urgent Care">Urgent Care</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-npi">NPI <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-npi" required placeholder="10-digit NPI">
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="location-tax-id">Tax ID <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-tax-id" required placeholder="XX-XXXXXXX">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Address</h3>
+                    <div class="form-group">
+                        <label for="location-address">Street Address <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="location-address" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="location-city">City <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="location-state">State <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-state" required maxlength="2" placeholder="XX">
+                        </div>
+                        <div class="form-group">
+                            <label for="location-zip">ZIP Code <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="location-zip" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Contact Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="location-phone">Phone <span style="color: #ef4444;">*</span></label>
+                            <input type="tel" id="location-phone" required placeholder="555-2001">
+                        </div>
+                        <div class="form-group">
+                            <label for="location-fax">Fax</label>
+                            <input type="tel" id="location-fax">
+                        </div>
+                        <div class="form-group">
+                            <label for="location-email">Email</label>
+                            <input type="email" id="location-email">
+                        </div>
+                        <div class="form-group">
+                            <label for="location-website">Website</label>
+                            <input type="url" id="location-website" placeholder="https://">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeLocationModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        Save Location
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payer Contract Modal -->
+    <div id="payer-contract-modal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="contract-modal-title">Add Payer Contract</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Create a new insurance payer contract with flexible identifiers
+                    </p>
+                </div>
+                <span class="close" onclick="closeContractModal()">&times;</span>
+            </div>
+            <form id="contract-form" onsubmit="saveContract(event)">
+                <input type="hidden" id="contract-edit-id">
+                <input type="hidden" id="contract-payer-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="contract-payer-name">Payer Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="contract-payer-name" required placeholder="e.g., Blue Cross Blue Shield">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-name">Contract Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="contract-name" required placeholder="e.g., PPO Network Agreement">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contract Identifiers -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b;">Contract Identifiers</h3>
+                        <button type="button" onclick="addContractIdentifier()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Identifier
+                        </button>
+                    </div>
+                    <div id="contract-identifiers-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No identifiers added. Click "Add Identifier" to add contract numbers, group IDs, etc.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Contact Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="contract-contact-name">Contact Name</label>
+                            <input type="text" id="contract-contact-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-email">Email</label>
+                            <input type="email" id="contract-email">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-phone">Phone</label>
+                            <input type="tel" id="contract-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-fax">Fax</label>
+                            <input type="tel" id="contract-fax">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Address</h3>
+                    <div class="form-group">
+                        <label for="contract-address">Street Address</label>
+                        <input type="text" id="contract-address">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="contract-city">City</label>
+                            <input type="text" id="contract-city">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-state">State</label>
+                            <input type="text" id="contract-state" maxlength="2">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-zip">ZIP Code</label>
+                            <input type="text" id="contract-zip">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contract Details -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Contract Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="contract-effective-date">Effective Date</label>
+                            <input type="date" id="contract-effective-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-expiration-date">Expiration Date</label>
+                            <input type="date" id="contract-expiration-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-status">Status</label>
+                            <select id="contract-status">
+                                <option value="Pending">Pending</option>
+                                <option value="Active">Active</option>
+                                <option value="Expired">Expired</option>
+                                <option value="Terminated">Terminated</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-website">Website</label>
+                            <input type="url" id="contract-website" placeholder="https://">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="contract-product-lines">Product Lines</label>
+                        <input type="text" id="contract-product-lines" placeholder="e.g., HMO, PPO, Medicare Advantage">
+                    </div>
+                    <div class="form-group">
+                        <label for="contract-fee-schedule-url">Fee Schedule URL</label>
+                        <input type="url" id="contract-fee-schedule-url" placeholder="https://">
+                    </div>
+
+                    <!-- Document Upload -->
+                    <div class="form-group">
+                        <label for="contract-document">Upload Contract Document</label>
+                        <input type="file" id="contract-document" accept=".pdf,.jpg,.jpeg,.png">
+                        <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.25rem;">
+                            Supported formats: PDF, JPG, PNG (max 10MB)
+                        </p>
+                    </div>
+
+                    <div style="text-align: center; color: #94a3b8; font-size: 0.875rem; padding: 0.5rem;">Or</div>
+
+                    <div class="form-group">
+                        <label for="contract-document-url">Enter Contract Document URL</label>
+                        <input type="url" id="contract-document-url" placeholder="https://">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contract-notes">Notes</label>
+                        <textarea id="contract-notes" rows="4" placeholder="Add any additional notes or information about this contract..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeContractModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Add Contract
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payer Detail View -->
+    <div id="payer-detail-view" class="view"></div>
+
+    <!-- Organization Modal -->
+    <div id="organization-modal" class="modal">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="organization-modal-title">Add Organization</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Create a new healthcare organization with comprehensive details
+                    </p>
+                </div>
+                <span class="close" onclick="closeOrganizationModal()">&times;</span>
+            </div>
+            <form id="organization-form" onsubmit="saveOrganization(event)">
+                <input type="hidden" id="organization-edit-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div class="form-group">
+                        <label for="org-name">Organization Name <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="org-name" required placeholder="e.g., Metropolitan Healthcare Group">
+                    </div>
+                    <div class="form-group">
+                        <label for="org-tin">Tax Identification Number (TIN) <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="org-tin" required placeholder="XX-XXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label for="org-website">Website</label>
+                        <input type="url" id="org-website" placeholder="https://www.example.com">
+                    </div>
+                </div>
+
+                <!-- DBA (Doing Business As) -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Doing Business As (DBA)</h3>
+                        <button type="button" onclick="addDBA()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add DBA Name
+                        </button>
+                    </div>
+                    <div id="dba-list"></div>
+                </div>
+
+                <!-- Corporate Address -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Corporate/Billing Address</h3>
+                    <div class="form-group">
+                        <label for="org-corporate-street">Street Address <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="org-corporate-street" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="org-corporate-city">City <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="org-corporate-city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-corporate-state">State <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="org-corporate-state" required maxlength="2" placeholder="XX">
+                        </div>
+                        <div class="form-group">
+                            <label for="org-corporate-zip">ZIP Code <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="org-corporate-zip" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mailing Address -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Mailing Address</h3>
+                    <div class="form-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="same-as-corporate" onchange="toggleMailingAddress()" checked>
+                            <span>Same as Corporate Address</span>
+                        </label>
+                    </div>
+                    <div id="mailing-address-section" style="display: none;">
+                        <div class="form-group">
+                            <label for="org-mailing-street">Street Address</label>
+                            <input type="text" id="org-mailing-street">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label for="org-mailing-city">City</label>
+                                <input type="text" id="org-mailing-city">
+                            </div>
+                            <div class="form-group">
+                                <label for="org-mailing-state">State</label>
+                                <input type="text" id="org-mailing-state" maxlength="2" placeholder="XX">
+                            </div>
+                            <div class="form-group">
+                                <label for="org-mailing-zip">ZIP Code</label>
+                                <input type="text" id="org-mailing-zip">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary Contact -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Primary Contact</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="org-primary-name">Full Name <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="org-primary-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-primary-title">Title <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="org-primary-title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-primary-email">Email <span style="color: #ef4444;">*</span></label>
+                            <input type="email" id="org-primary-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-primary-phone">Phone <span style="color: #ef4444;">*</span></label>
+                            <input type="tel" id="org-primary-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="org-primary-fax">Fax</label>
+                            <input type="tel" id="org-primary-fax">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authorized Officials -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Authorized Officials</h3>
+                        <button type="button" onclick="addOfficial()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Official
+                        </button>
+                    </div>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 1rem;">
+                        Add executives or officials authorized to represent the organization (CEO, CMO, etc.)
+                    </p>
+                    <div id="officials-list"></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeOrganizationModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        Save Organization
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Claim Modal -->
+    <div id="claim-modal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="claim-modal-title">Add Claim</h2>
+                    <p style="font-size: 0.875rem; color: #64748b; margin-top: 0.25rem;">
+                        Track malpractice and liability claims
+                    </p>
+                </div>
+                <span class="close" onclick="closeClaimModal()">&times;</span>
+            </div>
+            <form id="claim-form" onsubmit="saveClaim(event)">
+                <input type="hidden" id="claim-edit-id">
+
+                <!-- Basic Information -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Basic Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label for="claim-id">Claim ID <span style="color: #ef4444;">*</span></label>
+                            <input type="text" id="claim-id" required placeholder="e.g., CLM-2024-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-provider">Provider <span style="color: #ef4444;">*</span></label>
+                            <select id="claim-provider" required>
+                                <option value="">Select Provider</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-status">Status <span style="color: #ef4444;">*</span></label>
+                            <select id="claim-status" required>
+                                <option value="open">Open</option>
+                                <option value="pending">Pending</option>
+                                <option value="settled">Settled</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-incident-date">Incident Date <span style="color: #ef4444;">*</span></label>
+                            <input type="date" id="claim-incident-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-reserve-amount">Reserve Amount ($)</label>
+                            <input type="number" id="claim-reserve-amount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="claim-settlement-amount">Settlement Amount ($)</label>
+                            <input type="number" id="claim-settlement-amount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Details</h3>
+                    <div class="form-group">
+                        <label for="claim-description">Description</label>
+                        <textarea id="claim-description" rows="3" placeholder="Brief description of the claim..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="claim-notes">Notes</label>
+                        <textarea id="claim-notes" rows="3" placeholder="Additional notes or updates..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeClaimModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Save Claim
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js?v=6"></script>
+</body>
+</html>
