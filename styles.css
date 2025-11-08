@@ -603,3 +603,125 @@ form {
     color: #7f8c8d;
     text-transform: uppercase;
 }
+
+/* Providers, Payers, Enrollments Grids */
+.providers-grid,
+.payers-grid,
+.enrollments-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.provider-card,
+.payer-card,
+.enrollment-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.provider-card:hover,
+.payer-card:hover,
+.enrollment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.card-id {
+    font-size: 0.875rem;
+    color: #7f8c8d;
+    font-family: monospace;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.card-subtitle {
+    display: inline-block;
+    background-color: #ecf0f1;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #34495e;
+    margin-bottom: 1rem;
+}
+
+.card-details {
+    margin-bottom: 1rem;
+}
+
+.card-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* Textarea */
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Status badges */
+.status-pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-in-progress {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-denied {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-inactive {
+    background-color: #e2e3e5;
+    color: #383d41;
+}
+
+.status-suspended {
+    background-color: #f8d7da;
+    color: #721c24;
+}

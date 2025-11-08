@@ -77,9 +77,11 @@
             <div class="nav-brand">Credentialing System</div>
             <div class="nav-center">
                 <div class="nav-links" id="nav-links">
-                    <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
-                    <button class="nav-btn" onclick="showView('verify')">Verify Credential</button>
-                    <button class="nav-btn issuer-only" onclick="showView('recipients')" style="display: none;">My Recipients</button>
+                    <button class="nav-btn active" onclick="showView('dashboard')">Credentials</button>
+                    <button class="nav-btn" onclick="showView('providers')">Providers</button>
+                    <button class="nav-btn" onclick="showView('payers')">Payers</button>
+                    <button class="nav-btn" onclick="showView('enrollments')">Enrollments</button>
+                    <button class="nav-btn" onclick="showView('verify')">Verify</button>
                 </div>
             </div>
             <div class="nav-user">
@@ -121,15 +123,39 @@
             </div>
         </div>
 
-        <!-- Recipients View (Issuer Only) -->
-        <div id="recipients-view" class="view">
+        <!-- Providers View -->
+        <div id="providers-view" class="view">
             <div class="view-header">
-                <h1>My Recipients</h1>
-                <p style="color: #7f8c8d;">People who have received credentials from you</p>
+                <h1>Provider Management</h1>
+                <button class="btn btn-primary" onclick="showProviderModal()">+ Add Provider</button>
             </div>
 
-            <div class="recipients-grid" id="recipients-list">
-                <!-- Recipients will be dynamically loaded here -->
+            <div class="providers-grid" id="providers-list">
+                <!-- Providers will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Payers View -->
+        <div id="payers-view" class="view">
+            <div class="view-header">
+                <h1>Payer/Insurance Management</h1>
+                <button class="btn btn-primary" onclick="showPayerModal()">+ Add Payer</button>
+            </div>
+
+            <div class="payers-grid" id="payers-list">
+                <!-- Payers will be dynamically loaded here -->
+            </div>
+        </div>
+
+        <!-- Enrollments View -->
+        <div id="enrollments-view" class="view">
+            <div class="view-header">
+                <h1>Provider Enrollments</h1>
+                <button class="btn btn-primary" onclick="showEnrollmentModal()">+ Add Enrollment</button>
+            </div>
+
+            <div class="enrollments-grid" id="enrollments-list">
+                <!-- Enrollments will be dynamically loaded here -->
             </div>
         </div>
     </main>
@@ -198,6 +224,197 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Provider Modal -->
+    <div id="provider-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="provider-modal-title">Add Provider</h2>
+                <span class="close" onclick="closeProviderModal()">&times;</span>
+            </div>
+            <form id="provider-form" onsubmit="saveProvider(event)">
+                <input type="hidden" id="provider-edit-id">
+
+                <div class="form-group">
+                    <label for="provider-name">Provider Name *</label>
+                    <input type="text" id="provider-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-npi">NPI Number *</label>
+                    <input type="text" id="provider-npi" required placeholder="10-digit NPI">
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-specialty">Specialty *</label>
+                    <input type="text" id="provider-specialty" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-license">License Number *</label>
+                    <input type="text" id="provider-license" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-state">License State *</label>
+                    <select id="provider-state" required>
+                        <option value="">Select State</option>
+                        <option value="AL">Alabama</option>
+                        <option value="CA">California</option>
+                        <option value="FL">Florida</option>
+                        <option value="NY">New York</option>
+                        <option value="TX">Texas</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-email">Email *</label>
+                    <input type="email" id="provider-email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-phone">Phone *</label>
+                    <input type="tel" id="provider-phone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="provider-status">Status *</label>
+                    <select id="provider-status" required>
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeProviderModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payer Modal -->
+    <div id="payer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="payer-modal-title">Add Payer</h2>
+                <span class="close" onclick="closePayerModal()">&times;</span>
+            </div>
+            <form id="payer-form" onsubmit="savePayer(event)">
+                <input type="hidden" id="payer-edit-id">
+
+                <div class="form-group">
+                    <label for="payer-name">Payer/Insurance Name *</label>
+                    <input type="text" id="payer-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-type">Payer Type *</label>
+                    <select id="payer-type" required>
+                        <option value="">Select Type</option>
+                        <option value="Commercial">Commercial Insurance</option>
+                        <option value="Medicare">Medicare</option>
+                        <option value="Medicaid">Medicaid</option>
+                        <option value="Government">Government</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-id">Payer ID *</label>
+                    <input type="text" id="payer-id" required placeholder="5-digit Payer ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-contact">Contact Name</label>
+                    <input type="text" id="payer-contact">
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-phone">Phone</label>
+                    <input type="tel" id="payer-phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-email">Email</label>
+                    <input type="email" id="payer-email">
+                </div>
+
+                <div class="form-group">
+                    <label for="payer-status">Status *</label>
+                    <select id="payer-status" required>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePayerModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enrollment Modal -->
+    <div id="enrollment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="enrollment-modal-title">Add Enrollment</h2>
+                <span class="close" onclick="closeEnrollmentModal()">&times;</span>
+            </div>
+            <form id="enrollment-form" onsubmit="saveEnrollment(event)">
+                <input type="hidden" id="enrollment-edit-id">
+
+                <div class="form-group">
+                    <label for="enrollment-provider">Provider *</label>
+                    <select id="enrollment-provider" required>
+                        <option value="">Select Provider</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="enrollment-payer">Payer *</label>
+                    <select id="enrollment-payer" required>
+                        <option value="">Select Payer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="enrollment-application-date">Application Date *</label>
+                    <input type="date" id="enrollment-application-date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="enrollment-effective-date">Effective Date</label>
+                    <input type="date" id="enrollment-effective-date">
+                </div>
+
+                <div class="form-group">
+                    <label for="enrollment-status">Status *</label>
+                    <select id="enrollment-status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Denied">Denied</option>
+                        <option value="Expired">Expired</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="enrollment-notes">Notes</label>
+                    <textarea id="enrollment-notes" rows="3"></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEnrollmentModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </form>

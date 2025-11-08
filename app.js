@@ -2,12 +2,18 @@
 let credentials = [];
 let users = [];
 let currentUser = null;
+let providers = [];
+let payers = [];
+let enrollments = [];
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
     loadUsers();
     checkAuth();
     loadCredentials();
+    loadProviders();
+    loadPayers();
+    loadEnrollments();
 });
 
 // === Authentication Functions ===
@@ -369,8 +375,12 @@ function showView(viewName) {
     document.getElementById(`${viewName}-view`).classList.add('active');
 
     // Render content for specific views
-    if (viewName === 'recipients') {
-        renderRecipients();
+    if (viewName === 'providers') {
+        renderProviders();
+    } else if (viewName === 'payers') {
+        renderPayers();
+    } else if (viewName === 'enrollments') {
+        renderEnrollments();
     }
 }
 
@@ -561,10 +571,478 @@ function verifyCredential() {
     `;
 }
 
+// === Provider Management ===
+
+function loadProviders() {
+    const stored = localStorage.getItem('providers');
+    if (stored) {
+        providers = JSON.parse(stored);
+    } else {
+        providers = [
+            {
+                id: 'PROV-001',
+                name: 'Dr. Sarah Johnson',
+                npi: '1234567890',
+                specialty: 'Cardiology',
+                license: 'CA-12345',
+                state: 'CA',
+                email: 'sarah.johnson@hospital.com',
+                phone: '(555) 123-4567',
+                status: 'Active'
+            },
+            {
+                id: 'PROV-002',
+                name: 'Dr. Michael Chen',
+                npi: '9876543210',
+                specialty: 'Pediatrics',
+                license: 'NY-67890',
+                state: 'NY',
+                email: 'michael.chen@clinic.com',
+                phone: '(555) 987-6543',
+                status: 'Active'
+            }
+        ];
+        saveProviders();
+    }
+}
+
+function saveProviders() {
+    localStorage.setItem('providers', JSON.stringify(providers));
+}
+
+function renderProviders() {
+    const container = document.getElementById('providers-list');
+
+    if (providers.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>No providers found</h2>
+                <p>Click "Add Provider" to add your first provider.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = providers.map(provider => `
+        <div class="provider-card">
+            <div class="card-header">
+                <span class="card-id">${provider.id}</span>
+                <span class="credential-status status-${provider.status.toLowerCase()}">${provider.status}</span>
+            </div>
+            <div class="card-title">${provider.name}</div>
+            <span class="card-subtitle">${provider.specialty}</span>
+            <div class="card-details">
+                <div class="card-detail">
+                    <span class="detail-label">NPI:</span>
+                    <span class="detail-value">${provider.npi}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">License:</span>
+                    <span class="detail-value">${provider.license} (${provider.state})</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${provider.email}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">${provider.phone}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary btn-small" onclick="editProvider('${provider.id}')">Edit</button>
+                <button class="btn btn-danger btn-small" onclick="deleteProvider('${provider.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showProviderModal() {
+    document.getElementById('provider-modal-title').textContent = 'Add Provider';
+    document.getElementById('provider-form').reset();
+    document.getElementById('provider-edit-id').value = '';
+    document.getElementById('provider-modal').classList.add('active');
+}
+
+function closeProviderModal() {
+    document.getElementById('provider-modal').classList.remove('active');
+}
+
+function saveProvider(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('provider-edit-id').value;
+    const providerData = {
+        id: id || `PROV-${String(providers.length + 1).padStart(3, '0')}`,
+        name: document.getElementById('provider-name').value,
+        npi: document.getElementById('provider-npi').value,
+        specialty: document.getElementById('provider-specialty').value,
+        license: document.getElementById('provider-license').value,
+        state: document.getElementById('provider-state').value,
+        email: document.getElementById('provider-email').value,
+        phone: document.getElementById('provider-phone').value,
+        status: document.getElementById('provider-status').value
+    };
+
+    if (id) {
+        const index = providers.findIndex(p => p.id === id);
+        if (index !== -1) {
+            providers[index] = providerData;
+        }
+    } else {
+        providers.push(providerData);
+    }
+
+    saveProviders();
+    renderProviders();
+    closeProviderModal();
+}
+
+function editProvider(id) {
+    const provider = providers.find(p => p.id === id);
+    if (!provider) return;
+
+    document.getElementById('provider-modal-title').textContent = 'Edit Provider';
+    document.getElementById('provider-edit-id').value = provider.id;
+    document.getElementById('provider-name').value = provider.name;
+    document.getElementById('provider-npi').value = provider.npi;
+    document.getElementById('provider-specialty').value = provider.specialty;
+    document.getElementById('provider-license').value = provider.license;
+    document.getElementById('provider-state').value = provider.state;
+    document.getElementById('provider-email').value = provider.email;
+    document.getElementById('provider-phone').value = provider.phone;
+    document.getElementById('provider-status').value = provider.status;
+
+    document.getElementById('provider-modal').classList.add('active');
+}
+
+function deleteProvider(id) {
+    if (confirm('Are you sure you want to delete this provider?')) {
+        providers = providers.filter(p => p.id !== id);
+        saveProviders();
+        renderProviders();
+    }
+}
+
+// === Payer Management ===
+
+function loadPayers() {
+    const stored = localStorage.getItem('payers');
+    if (stored) {
+        payers = JSON.parse(stored);
+    } else {
+        payers = [
+            {
+                id: 'PAY-001',
+                name: 'Blue Cross Blue Shield',
+                type: 'Commercial',
+                payerId: '12345',
+                contact: 'Jane Smith',
+                phone: '(800) 555-1234',
+                email: 'provider.relations@bcbs.com',
+                status: 'Active'
+            },
+            {
+                id: 'PAY-002',
+                name: 'Medicare',
+                type: 'Medicare',
+                payerId: '00001',
+                contact: 'Medicare Services',
+                phone: '(800) 633-4227',
+                email: 'provider@medicare.gov',
+                status: 'Active'
+            }
+        ];
+        savePayers();
+    }
+}
+
+function savePayers() {
+    localStorage.setItem('payers', JSON.stringify(payers));
+}
+
+function renderPayers() {
+    const container = document.getElementById('payers-list');
+
+    if (payers.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>No payers found</h2>
+                <p>Click "Add Payer" to add your first payer.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = payers.map(payer => `
+        <div class="payer-card">
+            <div class="card-header">
+                <span class="card-id">${payer.id}</span>
+                <span class="credential-status status-${payer.status.toLowerCase()}">${payer.status}</span>
+            </div>
+            <div class="card-title">${payer.name}</div>
+            <span class="card-subtitle">${payer.type}</span>
+            <div class="card-details">
+                <div class="card-detail">
+                    <span class="detail-label">Payer ID:</span>
+                    <span class="detail-value">${payer.payerId}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Contact:</span>
+                    <span class="detail-value">${payer.contact}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">${payer.phone}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">${payer.email}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary btn-small" onclick="editPayer('${payer.id}')">Edit</button>
+                <button class="btn btn-danger btn-small" onclick="deletePayer('${payer.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showPayerModal() {
+    document.getElementById('payer-modal-title').textContent = 'Add Payer';
+    document.getElementById('payer-form').reset();
+    document.getElementById('payer-edit-id').value = '';
+    document.getElementById('payer-modal').classList.add('active');
+}
+
+function closePayerModal() {
+    document.getElementById('payer-modal').classList.remove('active');
+}
+
+function savePayer(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('payer-edit-id').value;
+    const payerData = {
+        id: id || `PAY-${String(payers.length + 1).padStart(3, '0')}`,
+        name: document.getElementById('payer-name').value,
+        type: document.getElementById('payer-type').value,
+        payerId: document.getElementById('payer-id').value,
+        contact: document.getElementById('payer-contact').value,
+        phone: document.getElementById('payer-phone').value,
+        email: document.getElementById('payer-email').value,
+        status: document.getElementById('payer-status').value
+    };
+
+    if (id) {
+        const index = payers.findIndex(p => p.id === id);
+        if (index !== -1) {
+            payers[index] = payerData;
+        }
+    } else {
+        payers.push(payerData);
+    }
+
+    savePayers();
+    renderPayers();
+    closePayerModal();
+}
+
+function editPayer(id) {
+    const payer = payers.find(p => p.id === id);
+    if (!payer) return;
+
+    document.getElementById('payer-modal-title').textContent = 'Edit Payer';
+    document.getElementById('payer-edit-id').value = payer.id;
+    document.getElementById('payer-name').value = payer.name;
+    document.getElementById('payer-type').value = payer.type;
+    document.getElementById('payer-id').value = payer.payerId;
+    document.getElementById('payer-contact').value = payer.contact;
+    document.getElementById('payer-phone').value = payer.phone;
+    document.getElementById('payer-email').value = payer.email;
+    document.getElementById('payer-status').value = payer.status;
+
+    document.getElementById('payer-modal').classList.add('active');
+}
+
+function deletePayer(id) {
+    if (confirm('Are you sure you want to delete this payer?')) {
+        payers = payers.filter(p => p.id !== id);
+        savePayers();
+        renderPayers();
+    }
+}
+
+// === Enrollment Management ===
+
+function loadEnrollments() {
+    const stored = localStorage.getItem('enrollments');
+    if (stored) {
+        enrollments = JSON.parse(stored);
+    } else {
+        enrollments = [
+            {
+                id: 'ENR-001',
+                providerId: 'PROV-001',
+                payerId: 'PAY-001',
+                applicationDate: '2024-01-15',
+                effectiveDate: '2024-02-01',
+                status: 'Approved',
+                notes: 'Initial enrollment approved'
+            },
+            {
+                id: 'ENR-002',
+                providerId: 'PROV-002',
+                payerId: 'PAY-002',
+                applicationDate: '2024-03-10',
+                effectiveDate: '',
+                status: 'Pending',
+                notes: 'Waiting for background check'
+            }
+        ];
+        saveEnrollments();
+    }
+}
+
+function saveEnrollments() {
+    localStorage.setItem('enrollments', JSON.stringify(enrollments));
+}
+
+function renderEnrollments() {
+    const container = document.getElementById('enrollments-list');
+
+    if (enrollments.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>No enrollments found</h2>
+                <p>Click "Add Enrollment" to add your first enrollment.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = enrollments.map(enrollment => {
+        const provider = providers.find(p => p.id === enrollment.providerId);
+        const payer = payers.find(p => p.id === enrollment.payerId);
+
+        return `
+            <div class="enrollment-card">
+                <div class="card-header">
+                    <span class="card-id">${enrollment.id}</span>
+                    <span class="credential-status status-${enrollment.status.toLowerCase().replace(' ', '-')}">${enrollment.status}</span>
+                </div>
+                <div class="card-title">${provider ? provider.name : 'Unknown Provider'}</div>
+                <span class="card-subtitle">${payer ? payer.name : 'Unknown Payer'}</span>
+                <div class="card-details">
+                    <div class="card-detail">
+                        <span class="detail-label">Application Date:</span>
+                        <span class="detail-value">${formatDate(enrollment.applicationDate)}</span>
+                    </div>
+                    ${enrollment.effectiveDate ? `
+                    <div class="card-detail">
+                        <span class="detail-label">Effective Date:</span>
+                        <span class="detail-value">${formatDate(enrollment.effectiveDate)}</span>
+                    </div>
+                    ` : ''}
+                    ${enrollment.notes ? `
+                    <div class="card-detail">
+                        <span class="detail-label">Notes:</span>
+                        <span class="detail-value">${enrollment.notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary btn-small" onclick="editEnrollment('${enrollment.id}')">Edit</button>
+                    <button class="btn btn-danger btn-small" onclick="deleteEnrollment('${enrollment.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function populateEnrollmentDropdowns() {
+    const providerSelect = document.getElementById('enrollment-provider');
+    const payerSelect = document.getElementById('enrollment-payer');
+
+    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
+        providers.map(p => `<option value="${p.id}">${p.name} - ${p.specialty}</option>`).join('');
+
+    payerSelect.innerHTML = '<option value="">Select Payer</option>' +
+        payers.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+function showEnrollmentModal() {
+    document.getElementById('enrollment-modal-title').textContent = 'Add Enrollment';
+    document.getElementById('enrollment-form').reset();
+    document.getElementById('enrollment-edit-id').value = '';
+    populateEnrollmentDropdowns();
+    document.getElementById('enrollment-modal').classList.add('active');
+}
+
+function closeEnrollmentModal() {
+    document.getElementById('enrollment-modal').classList.remove('active');
+}
+
+function saveEnrollment(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('enrollment-edit-id').value;
+    const enrollmentData = {
+        id: id || `ENR-${String(enrollments.length + 1).padStart(3, '0')}`,
+        providerId: document.getElementById('enrollment-provider').value,
+        payerId: document.getElementById('enrollment-payer').value,
+        applicationDate: document.getElementById('enrollment-application-date').value,
+        effectiveDate: document.getElementById('enrollment-effective-date').value,
+        status: document.getElementById('enrollment-status').value,
+        notes: document.getElementById('enrollment-notes').value
+    };
+
+    if (id) {
+        const index = enrollments.findIndex(e => e.id === id);
+        if (index !== -1) {
+            enrollments[index] = enrollmentData;
+        }
+    } else {
+        enrollments.push(enrollmentData);
+    }
+
+    saveEnrollments();
+    renderEnrollments();
+    closeEnrollmentModal();
+}
+
+function editEnrollment(id) {
+    const enrollment = enrollments.find(e => e.id === id);
+    if (!enrollment) return;
+
+    document.getElementById('enrollment-modal-title').textContent = 'Edit Enrollment';
+    document.getElementById('enrollment-edit-id').value = enrollment.id;
+    populateEnrollmentDropdowns();
+    document.getElementById('enrollment-provider').value = enrollment.providerId;
+    document.getElementById('enrollment-payer').value = enrollment.payerId;
+    document.getElementById('enrollment-application-date').value = enrollment.applicationDate;
+    document.getElementById('enrollment-effective-date').value = enrollment.effectiveDate;
+    document.getElementById('enrollment-status').value = enrollment.status;
+    document.getElementById('enrollment-notes').value = enrollment.notes;
+
+    document.getElementById('enrollment-modal').classList.add('active');
+}
+
+function deleteEnrollment(id) {
+    if (confirm('Are you sure you want to delete this enrollment?')) {
+        enrollments = enrollments.filter(e => e.id !== id);
+        saveEnrollments();
+        renderEnrollments();
+    }
+}
+
 // Close modal when clicking outside
 window.onclick = function(event) {
-    const modal = document.getElementById('credential-modal');
-    if (event.target === modal) {
-        closeModal();
-    }
+    const modals = ['credential-modal', 'provider-modal', 'payer-modal', 'enrollment-modal'];
+    modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (event.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
 }
