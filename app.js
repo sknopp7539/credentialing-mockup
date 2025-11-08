@@ -52,8 +52,8 @@ function showAuthScreen() {
 function showMainApp() {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('main-app').style.display = 'flex';
-    updateDashboard();
-    renderProviders();
+    // Don't call updateDashboard here - it will be called after organizations are loaded
+    // renderProviders() will be called from loadData() after data is loaded
 }
 
 function login(event) {
@@ -229,6 +229,7 @@ function loadOrganizations() {
     }
 
     updateOrganizationDisplay();
+    // Dashboard will be updated after data is loaded in loadData()
 }
 
 function saveOrganizations() {
@@ -945,6 +946,12 @@ function loadData() {
             }
         ];
         saveLocations();
+    }
+
+    // Render views after data is loaded (if user is logged in and main app is visible)
+    if (currentUser && document.getElementById('main-app').style.display !== 'none') {
+        updateDashboard();  // Update dashboard with loaded data
+        renderProviders();  // Render providers list
     }
 }
 
