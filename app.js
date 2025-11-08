@@ -214,20 +214,48 @@ function loadData() {
                 id: 'LOC-001',
                 name: 'Main Medical Center',
                 type: 'Hospital',
-                address: '123 Health St',
-                city: 'San Francisco',
-                state: 'CA',
-                phone: '(555) 100-1000',
+                npi: '9876543210',
+                taxId: '12-3456789',
+                address: '123 Hospital Blvd',
+                city: 'New York',
+                state: 'NY',
+                zipCode: '10001',
+                phone: '555-2001',
+                fax: '555-2002',
+                email: 'info@mainmedical.com',
+                website: 'https://www.mainmedical.com',
                 status: 'Active'
             },
             {
                 id: 'LOC-002',
                 name: 'Downtown Clinic',
                 type: 'Clinic',
+                npi: '9876543211',
+                taxId: '12-3456790',
                 address: '456 Medical Ave',
-                city: 'Oakland',
+                city: 'Los Angeles',
                 state: 'CA',
-                phone: '(555) 200-2000',
+                zipCode: '90001',
+                phone: '555-2003',
+                fax: '555-2004',
+                email: 'contact@downtownclinic.com',
+                website: 'https://www.downtownclinic.com',
+                status: 'Active'
+            },
+            {
+                id: 'LOC-003',
+                name: 'Westside Medical Office',
+                type: 'Office',
+                npi: '9876543212',
+                taxId: '12-3456791',
+                address: '789 Health St',
+                city: 'Chicago',
+                state: 'IL',
+                zipCode: '60601',
+                phone: '555-2005',
+                fax: '555-2006',
+                email: 'info@westside-medical.com',
+                website: 'https://www.westside-medical.com',
                 status: 'Active'
             }
         ];
@@ -744,32 +772,86 @@ function renderLocations() {
     const container = document.getElementById('locations-list');
     if (!container) return;
 
-    if (locations.length === 0) {
-        container.innerHTML = '<div class="coming-soon">No locations found.</div>';
+    // Filter locations to exclude archived ones
+    const activeLocations = locations.filter(l => l.status !== 'Archived');
+
+    // Apply search filter
+    const searchTerm = document.getElementById('location-search')?.value.toLowerCase() || '';
+    let filteredLocations = activeLocations;
+    if (searchTerm) {
+        filteredLocations = activeLocations.filter(location =>
+            location.name.toLowerCase().includes(searchTerm) ||
+            location.city.toLowerCase().includes(searchTerm) ||
+            location.type.toLowerCase().includes(searchTerm) ||
+            (location.npi && location.npi.includes(searchTerm))
+        );
+    }
+
+    // Update count
+    const countElement = document.getElementById('locations-count');
+    if (countElement) {
+        countElement.textContent = filteredLocations.length;
+    }
+
+    if (filteredLocations.length === 0) {
+        container.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                    ${searchTerm ? 'No locations found matching your search.' : 'No locations found. Click "Add Location" to get started.'}
+                </td>
+            </tr>
+        `;
         return;
     }
 
-    container.innerHTML = locations.map(location => `
-        <div class="location-card">
-            <div class="card-header">
-                <span style="font-family: monospace; color: #64748b; font-size: 0.875rem;">${location.id}</span>
-                <span class="status-badge status-${location.status.toLowerCase()}">${location.status}</span>
-            </div>
-            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">${location.name}</h3>
-            <div style="background: #f1f5f9; padding: 0.375rem 0.75rem; border-radius: 6px; display: inline-block; font-size: 0.875rem; margin-bottom: 1rem;">
-                ${location.type}
-            </div>
-            <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem;">
-                <div>${location.address}</div>
-                <div>${location.city}, ${location.state}</div>
-                <div>📞 ${location.phone}</div>
-            </div>
-            <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
-                <button class="btn btn-primary btn-small" onclick="editLocation('${location.id}')">Edit</button>
-                <button class="btn btn-danger btn-small" onclick="deleteLocation('${location.id}')">Delete</button>
-            </div>
-        </div>
+    container.innerHTML = filteredLocations.map(location => `
+        <tr>
+            <td>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #94a3b8;">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                    <span style="font-weight: 500; color: #1e293b;">${location.name}</span>
+                </div>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: #64748b;">${location.type}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: #1e293b;">${location.npi || '-'}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: #1e293b;">${location.taxId || '-'}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: #64748b;">${location.city}, ${location.state}</span>
+            </td>
+            <td>
+                <span style="font-size: 0.875rem; color: #64748b;">${location.phone}</span>
+            </td>
+            <td>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn btn-primary btn-small" onclick="editLocation('${location.id}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="archiveLocation('${location.id}')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
     `).join('');
+}
+
+function filterLocations() {
+    renderLocations();
 }
 
 function showLocationModal() {
@@ -791,10 +873,16 @@ function saveLocation(event) {
         id: id || `LOC-${String(locations.length + 1).padStart(3, '0')}`,
         name: document.getElementById('location-name').value,
         type: document.getElementById('location-type').value,
+        npi: document.getElementById('location-npi').value,
+        taxId: document.getElementById('location-tax-id').value,
         address: document.getElementById('location-address').value,
         city: document.getElementById('location-city').value,
-        state: document.getElementById('location-state').value,
+        state: document.getElementById('location-state').value.toUpperCase(),
+        zipCode: document.getElementById('location-zip').value,
         phone: document.getElementById('location-phone').value,
+        fax: document.getElementById('location-fax').value,
+        email: document.getElementById('location-email').value,
+        website: document.getElementById('location-website').value,
         status: 'Active'
     };
 
@@ -820,20 +908,35 @@ function editLocation(id) {
     document.getElementById('location-edit-id').value = location.id;
     document.getElementById('location-name').value = location.name;
     document.getElementById('location-type').value = location.type;
+    document.getElementById('location-npi').value = location.npi || '';
+    document.getElementById('location-tax-id').value = location.taxId || '';
     document.getElementById('location-address').value = location.address;
     document.getElementById('location-city').value = location.city;
     document.getElementById('location-state').value = location.state;
+    document.getElementById('location-zip').value = location.zipCode || '';
     document.getElementById('location-phone').value = location.phone;
+    document.getElementById('location-fax').value = location.fax || '';
+    document.getElementById('location-email').value = location.email || '';
+    document.getElementById('location-website').value = location.website || '';
 
     document.getElementById('location-modal').classList.add('active');
 }
 
-function deleteLocation(id) {
-    if (confirm('Are you sure you want to delete this location?')) {
-        locations = locations.filter(l => l.id !== id);
-        saveLocations();
-        renderLocations();
+function archiveLocation(id) {
+    if (confirm('Are you sure you want to archive this location? It will be moved to archived locations.')) {
+        const location = locations.find(l => l.id === id);
+        if (location) {
+            location.status = 'Archived';
+            location.archivedAt = new Date().toISOString().split('T')[0];
+            saveLocations();
+            renderLocations();
+        }
     }
+}
+
+// Keep old function for backwards compatibility, but redirect to archive
+function deleteLocation(id) {
+    archiveLocation(id);
 }
 
 // ===== ANALYTICS =====
