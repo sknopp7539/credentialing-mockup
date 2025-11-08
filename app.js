@@ -219,6 +219,44 @@ function loadOrganizations() {
                 website: 'https://www.coastalmed.com',
                 status: 'Active',
                 createdAt: '2024-02-01'
+            },
+            {
+                id: 'ORG-003',
+                name: 'Knopp Medical',
+                dba: [],
+                corporateAddress: {
+                    street: '1200 Medical Park Dr',
+                    city: 'Houston',
+                    state: 'TX',
+                    zipCode: '77002'
+                },
+                mailingAddress: {
+                    street: '1200 Medical Park Dr',
+                    city: 'Houston',
+                    state: 'TX',
+                    zipCode: '77002',
+                    sameAsCorporate: true
+                },
+                tin: '45-6789012',
+                authorizedOfficials: [
+                    {
+                        id: 1,
+                        name: 'Stephen Knopp',
+                        title: 'Chief Executive Officer',
+                        email: 'stephen.knopp@knoppmedical.com',
+                        phone: '(555) 300-0001'
+                    }
+                ],
+                primaryContact: {
+                    name: 'Stephen Knopp',
+                    title: 'CEO',
+                    email: 'stephen.knopp@knoppmedical.com',
+                    phone: '(555) 300-0010',
+                    fax: '(555) 300-0011'
+                },
+                website: 'https://www.knoppmedical.com',
+                status: 'Active',
+                createdAt: '2024-03-01'
             }
         ];
         saveOrganizations();
@@ -835,6 +873,55 @@ function loadData() {
                     { id: 1, name: 'Malpractice Insurance', type: 'Insurance', expiration: '12/31/2025', uploaded: '09/15/2024', status: 'Valid' }
                 ],
                 archivedDocuments: []
+            },
+            {
+                id: 'PROV-004',
+                organizationId: 'ORG-003',
+                firstName: 'James',
+                lastName: 'Williams',
+                name: 'Dr. James Williams',
+                specialty: 'Internal Medicine',
+                npi: '6666666666',
+                taxId: '66-6666666',
+                email: 'james.w@knoppmedical.com',
+                phone: '(555) 666-6666',
+                address: '1200 Medical Park Dr',
+                city: 'Houston',
+                state: 'TX',
+                zipCode: '77002',
+                status: 'Active',
+                licenses: [
+                    {
+                        name: 'State Medical License (TX)',
+                        state: 'TX',
+                        status: 'active',
+                        number: 'TX-88888',
+                        issueDate: '01/15/2020',
+                        expiration: '01/15/2026',
+                        documents: [
+                            { name: 'license-scan-james-williams.pdf', expires: '01/15/2026' }
+                        ]
+                    }
+                ],
+                archivedLicenses: [],
+                liabilityInsurance: [
+                    {
+                        carrier: 'Medical Protective',
+                        policyNumber: 'MP-123456',
+                        effectiveDate: '2024-01-01',
+                        expirationDate: '2025-01-01',
+                        coverageAmount: '1000000/3000000'
+                    }
+                ],
+                payerEnrollments: [
+                    { name: 'Medicare', npi: '6666666666', status: 'Active', expirationStatus: 'Current' },
+                    { name: 'Blue Cross Blue Shield', npi: '6666666666', status: 'Active', expirationStatus: 'Current' }
+                ],
+                documents: [
+                    { id: 1, name: 'Malpractice Insurance', type: 'Insurance', expiration: '01/01/2025', uploaded: '01/01/2024', status: 'Valid' },
+                    { id: 2, name: 'Board Certification', type: 'Certificate', expiration: '06/30/2026', uploaded: '01/15/2024', status: 'Valid' }
+                ],
+                archivedDocuments: []
             }
         ];
         saveProviders();
@@ -890,6 +977,20 @@ function loadData() {
                 payerId: 'PAY-002',
                 applicationDate: '2024-02-20',
                 status: 'Pending'
+            },
+            {
+                id: 'ENR-003',
+                providerId: 'PROV-004',
+                payerId: 'PAY-003',
+                applicationDate: '2024-03-01',
+                status: 'Approved'
+            },
+            {
+                id: 'ENR-004',
+                providerId: 'PROV-004',
+                payerId: 'PAY-001',
+                applicationDate: '2024-03-01',
+                status: 'Approved'
             }
         ];
         saveEnrollments();
@@ -4355,8 +4456,8 @@ function loadClaims() {
             {
                 id: 'CLM-2023-045',
                 claimId: 'CLM-2023-045',
-                providerId: 'PROV-003',
-                organizationId: 'ORG-002',
+                providerId: 'PROV-004',
+                organizationId: 'ORG-003',
                 status: 'settled',
                 reserveAmount: 100000,
                 settlementAmount: 45000,
