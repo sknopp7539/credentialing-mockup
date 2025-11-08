@@ -280,7 +280,9 @@ function switchOrganization(orgId) {
             const viewId = activeView.id.replace('-view', '');
             console.log('🏢 Reloading view:', viewId);
 
-            if (viewId === 'providers') {
+            if (viewId === 'dashboard') {
+                updateDashboard();
+            } else if (viewId === 'providers') {
                 renderProviders();
             } else if (viewId === 'credentialing') {
                 renderCredentialing();
@@ -979,46 +981,116 @@ function renderExpirationsTable() {
     const tbody = document.getElementById('expirations-tbody');
     if (!tbody) return;
 
-    const sampleExpirations = [
-        {
-            provider: 'Dr. Sarah Johnson',
-            specialty: 'Family Medicine',
-            document: 'State Medical License',
-            category: 'License',
-            expiresIn: '30 days',
-            dueDate: '12/15/2024',
-            status: 'Upcoming'
-        },
-        {
-            provider: 'Dr. Michael Chen',
-            specialty: 'Cardiology',
-            document: 'DEA Certificate',
-            category: 'License',
-            expiresIn: '60 days',
-            dueDate: '01/15/2025',
-            status: 'Upcoming'
-        },
-        {
-            provider: 'Dr. Emily Davis',
-            specialty: 'Pediatrics',
-            document: 'Board Certification',
-            category: 'Education',
-            expiresIn: 'Overdue',
-            dueDate: '10/01/2024',
-            status: 'Expired'
-        },
-        {
-            provider: 'Dr. Sarah Johnson',
-            specialty: 'Family Medicine',
-            document: 'Malpractice Insurance',
-            category: 'Insurance',
-            expiresIn: '15 days',
-            dueDate: '11/30/2024',
-            status: 'Upcoming'
-        }
-    ];
+    console.log('📅 Rendering expirations table...');
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
 
-    tbody.innerHTML = sampleExpirations.map(item => `
+    // Filter providers by current organization
+    const orgProviders = currentOrganization ?
+        providers.filter(p => p.organizationId === currentOrganization.id) :
+        providers;
+
+    console.log('   Providers in current org:', orgProviders.length);
+
+    // Collect all expirations from providers
+    const expirations = [];
+    const today = new Date();
+
+    orgProviders.forEach(provider => {
+        const providerName = `${provider.firstName || ''} ${provider.lastName || ''}`.trim() || provider.name || 'Unknown Provider';
+        const providerSpecialty = provider.specialty || 'N/A';
+
+        // Extract license expirations
+        if (provider.licenses && Array.isArray(provider.licenses)) {
+            provider.licenses.forEach(license => {
+                if (license.expiration) {
+                    const expirationDate = new Date(license.expiration);
+                    const daysUntil = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+
+                    let status, expiresIn;
+                    if (daysUntil < 0) {
+                        status = 'Expired';
+                        expiresIn = 'Overdue';
+                    } else if (daysUntil <= 30) {
+                        status = 'Urgent';
+                        expiresIn = `${daysUntil} days`;
+                    } else if (daysUntil <= 60) {
+                        status = 'Warning';
+                        expiresIn = `${daysUntil} days`;
+                    } else {
+                        status = 'Upcoming';
+                        expiresIn = `${daysUntil} days`;
+                    }
+
+                    expirations.push({
+                        provider: providerName,
+                        specialty: providerSpecialty,
+                        document: license.name || `State License (${license.state})`,
+                        category: 'License',
+                        expiresIn,
+                        daysUntil,
+                        dueDate: new Date(license.expiration).toLocaleDateString(),
+                        status
+                    });
+                }
+            });
+        }
+
+        // Extract liability insurance expirations
+        if (provider.liabilityInsurance && Array.isArray(provider.liabilityInsurance)) {
+            provider.liabilityInsurance.forEach(insurance => {
+                if (insurance.expirationDate) {
+                    const expirationDate = new Date(insurance.expirationDate);
+                    const daysUntil = Math.ceil((expirationDate - today) / (1000 * 60 * 60 * 24));
+
+                    let status, expiresIn;
+                    if (daysUntil < 0) {
+                        status = 'Expired';
+                        expiresIn = 'Overdue';
+                    } else if (daysUntil <= 30) {
+                        status = 'Urgent';
+                        expiresIn = `${daysUntil} days`;
+                    } else if (daysUntil <= 60) {
+                        status = 'Warning';
+                        expiresIn = `${daysUntil} days`;
+                    } else {
+                        status = 'Upcoming';
+                        expiresIn = `${daysUntil} days`;
+                    }
+
+                    expirations.push({
+                        provider: providerName,
+                        specialty: providerSpecialty,
+                        document: `Malpractice Insurance (${insurance.carrier || 'Unknown'})`,
+                        category: 'Insurance',
+                        expiresIn,
+                        daysUntil,
+                        dueDate: new Date(insurance.expirationDate).toLocaleDateString(),
+                        status
+                    });
+                }
+            });
+        }
+    });
+
+    // Sort by days until expiration (most urgent first)
+    expirations.sort((a, b) => a.daysUntil - b.daysUntil);
+
+    console.log('   Total expirations found:', expirations.length);
+
+    if (expirations.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 3rem; color: #94a3b8;">
+                    ${currentOrganization ?
+                        `No upcoming expirations found for ${currentOrganization.name}. Add providers with licenses to track expirations.` :
+                        'No upcoming expirations found. Select an organization and add providers with licenses to track expirations.'}
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = expirations.map(item => `
         <tr>
             <td>
                 <div style="font-weight: 500; color: #1e293b;">${item.provider}</div>
@@ -1038,7 +1110,7 @@ function renderExpirationsTable() {
             <td>
                 <div style="display: flex; gap: 0.5rem;">
                     <button class="btn btn-secondary btn-small">View Details</button>
-                    <button class="btn btn-danger btn-small">Resolve</button>
+                    <button class="btn btn-primary btn-small">Renew</button>
                 </div>
             </td>
         </tr>
