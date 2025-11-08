@@ -71,6 +71,7 @@
             <button class="btn" onclick="loadData()">Refresh Data</button>
             <button class="btn" onclick="fixProviderOrganizations()">Fix Provider Organization IDs</button>
             <button class="btn" onclick="fixContractOrganizations()">Fix Contract Organization IDs</button>
+            <button class="btn" onclick="fixPayerOrganizations()">Fix Payer Organization IDs</button>
             <button class="btn btn-danger" onclick="clearProviders()">Clear All Providers</button>
             <button class="btn" onclick="window.location.href='index.html'">Back to App</button>
         </div>
@@ -232,6 +233,47 @@
                 }, 500);
             } else {
                 alert('No contracts needed fixing. All contracts already have valid organization IDs.');
+            }
+        }
+
+        function fixPayerOrganizations() {
+            const currentOrgData = localStorage.getItem('pvCurrentOrganization');
+            if (!currentOrgData) {
+                alert('No current organization found. Please select an organization in the main app first.');
+                return;
+            }
+
+            const currentOrg = JSON.parse(currentOrgData);
+            const payersData = localStorage.getItem('pvPayers');
+
+            if (!payersData) {
+                alert('No payers found to fix.');
+                return;
+            }
+
+            const payers = JSON.parse(payersData);
+            let fixedCount = 0;
+            const fixedPayers = [];
+
+            payers.forEach(payer => {
+                if (!payer.organizationId || payer.organizationId === 'null' || payer.organizationId === null) {
+                    payer.organizationId = currentOrg.id;
+                    fixedCount++;
+                    fixedPayers.push(payer.name);
+                }
+            });
+
+            if (fixedCount > 0) {
+                localStorage.setItem('pvPayers', JSON.stringify(payers));
+                const message = `✓ Fixed ${fixedCount} payer(s) and assigned them to "${currentOrg.name}":\n${fixedPayers.join(', ')}`;
+                document.getElementById('fix-message').style.display = 'block';
+                document.getElementById('fix-message').innerHTML = '<strong>Success!</strong> ' + message.replace(/\n/g, '<br>');
+                loadData();
+                setTimeout(() => {
+                    alert('Payers fixed! Go back to the main app and refresh the page (Ctrl+Shift+R) to see the changes.');
+                }, 500);
+            } else {
+                alert('No payers needed fixing. All payers already have valid organization IDs.');
             }
         }
 

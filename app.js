@@ -2869,14 +2869,26 @@ function renderPayers() {
     console.log('💳 Rendering payers view...');
     console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
 
-    if (payers.length === 0) {
-        container.innerHTML = '<div class="coming-soon">No payers found. Click "Add Payer" to get started.</div>';
+    // Filter payers by current organization
+    const orgPayers = currentOrganization ?
+        payers.filter(p => p.organizationId === currentOrganization.id) :
+        payers;
+
+    console.log('   Total payers in system:', payers.length);
+    console.log('   Payers for current organization:', orgPayers.length);
+
+    if (orgPayers.length === 0) {
+        container.innerHTML = `
+            <div class="coming-soon">
+                ${currentOrganization ?
+                    `No payers found for ${currentOrganization.name}. Click "Add Payer" to add insurance companies for this organization.` :
+                    'No payers found. Click "Add Payer" to get started.'}
+            </div>
+        `;
         return;
     }
 
-    console.log('   Total payers in system:', payers.length);
-
-    container.innerHTML = payers.map(payer => {
+    container.innerHTML = orgPayers.map(payer => {
         // Filter contracts by current organization AND payer
         const payerContracts = currentOrganization ?
             contracts.filter(c =>
@@ -2924,9 +2936,16 @@ function closePayerModal() {
 function savePayer(event) {
     event.preventDefault();
 
+    console.log('💳 ========== SAVE PAYER CALLED ==========');
+    console.log('💳 Current Organization at time of save:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'NULL - THIS IS A PROBLEM!');
+
     const id = document.getElementById('payer-edit-id').value;
+    const assignedOrgId = currentOrganization ? currentOrganization.id : null;
+    console.log('💳 Assigning organizationId:', assignedOrgId);
+
     const payerData = {
         id: id || `PAY-${String(payers.length + 1).padStart(3, '0')}`,
+        organizationId: assignedOrgId,
         name: document.getElementById('payer-name').value,
         type: document.getElementById('payer-type').value,
         payerId: document.getElementById('payer-id').value,
@@ -2936,15 +2955,27 @@ function savePayer(event) {
     if (id) {
         const index = payers.findIndex(p => p.id === id);
         if (index !== -1) {
+            // Preserve organizationId when editing
+            const existingPayer = payers[index];
+            payerData.organizationId = existingPayer.organizationId || payerData.organizationId;
             payers[index] = payerData;
+            console.log('💳 Updated existing payer at index', index);
         }
     } else {
         payers.push(payerData);
+        console.log('💳 Added new payer to array');
     }
+
+    console.log('💳 Final payer data:', {
+        id: payerData.id,
+        name: payerData.name,
+        organizationId: payerData.organizationId
+    });
 
     savePayers();
     renderPayers();
     closePayerModal();
+    console.log('💳 ========== SAVE COMPLETE ==========');
 }
 
 function editPayer(id) {
