@@ -706,6 +706,111 @@
                     </div>
                 </div>
 
+                <!-- Hospital Affiliations -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Hospital Affiliations & Privileges</h3>
+                        <button type="button" onclick="addHospitalAffiliation()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Affiliation
+                        </button>
+                    </div>
+                    <div id="hospital-affiliations-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No hospital affiliations added. Click "Add Affiliation" to track hospital privileges.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Credentialing Contacts -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Credentialing Contacts</h3>
+                        <button type="button" onclick="addCredentialingContact()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Contact
+                        </button>
+                    </div>
+                    <div id="credentialing-contacts-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No credentialing contacts added. Click "Add Contact" to add primary source verification contacts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Professional Liability Insurance -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Professional Liability Insurance</h3>
+                        <button type="button" onclick="addLiabilityInsurance()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Policy
+                        </button>
+                    </div>
+                    <div id="liability-insurance-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No liability insurance policies added. Click "Add Policy" to track malpractice coverage.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Professional References -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin: 0;">Professional References</h3>
+                        <button type="button" onclick="addProfessionalReference()" class="btn btn-secondary btn-small">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Reference
+                        </button>
+                    </div>
+                    <div id="professional-references-list">
+                        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                            No professional references added. Click "Add Reference" to add reference contacts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Disclosures -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; color: #1e293b; margin-bottom: 1rem;">Disclosures & Attestations</h3>
+                    <div style="background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-sanctions-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any sanctions, disciplinary actions, or restrictions on medical license?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-malpractice-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any malpractice claims or settlements in the past 10 years?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="provider-felony-disclosed" style="width: 18px; height: 18px;">
+                                <span>Any felony convictions?</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-disclosures-notes">Disclosure Details</label>
+                            <textarea id="provider-disclosures-notes" rows="3" placeholder="If any disclosures were checked, provide details here..." style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeProviderModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">

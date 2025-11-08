@@ -16,6 +16,10 @@ let authorizedOfficials = [];
 let dbaNames = [];
 let providerLicenses = [];
 let providerLocations = [];
+let hospitalAffiliations = [];
+let credentialingContacts = [];
+let liabilityInsurancePolicies = [];
+let professionalReferences = [];
 let refreshTimer = 20;
 let refreshInterval = null;
 let currentNotificationFilter = 'all';
@@ -1854,6 +1858,319 @@ function getProviderLocations() {
     }).filter(loc => loc.locationId); // Only return locations that were actually selected
 }
 
+// Hospital Affiliations Management
+function addHospitalAffiliation() {
+    const list = document.getElementById('hospital-affiliations-list');
+    const id = Date.now();
+
+    const affiliationHtml = `
+        <div id="affiliation-${id}" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 600; color: #1e293b; margin: 0;">Affiliation #${hospitalAffiliations.length + 1}</h4>
+                <button type="button" onclick="removeHospitalAffiliation(${id})" class="btn-danger btn-small">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Remove
+                </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="form-group" style="grid-column: span 2;">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Hospital Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="affiliation-hospital" data-id="${id}" placeholder="e.g., Memorial Hospital" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Privilege Type</label>
+                    <select class="affiliation-type" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <option value="Admitting">Admitting Privileges</option>
+                        <option value="Consulting">Consulting Privileges</option>
+                        <option value="Courtesy">Courtesy Privileges</option>
+                        <option value="Active Staff">Active Staff</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Department</label>
+                    <input type="text" class="affiliation-department" data-id="${id}" placeholder="e.g., Cardiology" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Start Date</label>
+                    <input type="date" class="affiliation-start" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Status</label>
+                    <select class="affiliation-status" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <option value="Active">Active</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (hospitalAffiliations.length === 0) {
+        list.innerHTML = affiliationHtml;
+    } else {
+        list.insertAdjacentHTML('beforeend', affiliationHtml);
+    }
+
+    hospitalAffiliations.push({ id });
+}
+
+function removeHospitalAffiliation(id) {
+    document.getElementById(`affiliation-${id}`)?.remove();
+    hospitalAffiliations = hospitalAffiliations.filter(item => item.id !== id);
+
+    if (hospitalAffiliations.length === 0) {
+        document.getElementById('hospital-affiliations-list').innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No hospital affiliations added. Click "Add Affiliation" to track hospital privileges.
+            </p>
+        `;
+    }
+}
+
+function getHospitalAffiliations() {
+    return hospitalAffiliations.map(aff => ({
+        hospitalName: document.querySelector(`.affiliation-hospital[data-id="${aff.id}"]`)?.value || '',
+        privilegeType: document.querySelector(`.affiliation-type[data-id="${aff.id}"]`)?.value || 'Admitting',
+        department: document.querySelector(`.affiliation-department[data-id="${aff.id}"]`)?.value || '',
+        startDate: document.querySelector(`.affiliation-start[data-id="${aff.id}"]`)?.value || '',
+        status: document.querySelector(`.affiliation-status[data-id="${aff.id}"]`)?.value || 'Active'
+    })).filter(aff => aff.hospitalName);
+}
+
+// Credentialing Contacts Management
+function addCredentialingContact() {
+    const list = document.getElementById('credentialing-contacts-list');
+    const id = Date.now();
+
+    const contactHtml = `
+        <div id="cred-contact-${id}" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 600; color: #1e293b; margin: 0;">Contact #${credentialingContacts.length + 1}</h4>
+                <button type="button" onclick="removeCredentialingContact(${id})" class="btn-danger btn-small">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Remove
+                </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Organization <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="contact-org" data-id="${id}" placeholder="e.g., State Medical Board" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Contact Name</label>
+                    <input type="text" class="contact-name" data-id="${id}" placeholder="Contact person" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Phone</label>
+                    <input type="tel" class="contact-phone" data-id="${id}" placeholder="Phone number" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Email</label>
+                    <input type="email" class="contact-email" data-id="${id}" placeholder="Email address" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (credentialingContacts.length === 0) {
+        list.innerHTML = contactHtml;
+    } else {
+        list.insertAdjacentHTML('beforeend', contactHtml);
+    }
+
+    credentialingContacts.push({ id });
+}
+
+function removeCredentialingContact(id) {
+    document.getElementById(`cred-contact-${id}`)?.remove();
+    credentialingContacts = credentialingContacts.filter(item => item.id !== id);
+
+    if (credentialingContacts.length === 0) {
+        document.getElementById('credentialing-contacts-list').innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No credentialing contacts added. Click "Add Contact" to add primary source verification contacts.
+            </p>
+        `;
+    }
+}
+
+function getCredentialingContacts() {
+    return credentialingContacts.map(contact => ({
+        organization: document.querySelector(`.contact-org[data-id="${contact.id}"]`)?.value || '',
+        contactName: document.querySelector(`.contact-name[data-id="${contact.id}"]`)?.value || '',
+        phone: document.querySelector(`.contact-phone[data-id="${contact.id}"]`)?.value || '',
+        email: document.querySelector(`.contact-email[data-id="${contact.id}"]`)?.value || ''
+    })).filter(c => c.organization);
+}
+
+// Professional Liability Insurance Management
+function addLiabilityInsurance() {
+    const list = document.getElementById('liability-insurance-list');
+    const id = Date.now();
+
+    const policyHtml = `
+        <div id="policy-${id}" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 600; color: #1e293b; margin: 0;">Policy #${liabilityInsurancePolicies.length + 1}</h4>
+                <button type="button" onclick="removeLiabilityInsurance(${id})" class="btn-danger btn-small">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Remove
+                </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Insurance Carrier <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="policy-carrier" data-id="${id}" placeholder="e.g., ABC Insurance Co." style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Policy Number</label>
+                    <input type="text" class="policy-number" data-id="${id}" placeholder="Policy #" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Coverage Amount</label>
+                    <input type="text" class="policy-coverage" data-id="${id}" placeholder="e.g., $1M/$3M" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Policy Type</label>
+                    <select class="policy-type" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;">
+                        <option value="Claims-Made">Claims-Made</option>
+                        <option value="Occurrence">Occurrence</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Effective Date</label>
+                    <input type="date" class="policy-effective" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Expiration Date</label>
+                    <input type="date" class="policy-expiration" data-id="${id}" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (liabilityInsurancePolicies.length === 0) {
+        list.innerHTML = policyHtml;
+    } else {
+        list.insertAdjacentHTML('beforeend', policyHtml);
+    }
+
+    liabilityInsurancePolicies.push({ id });
+}
+
+function removeLiabilityInsurance(id) {
+    document.getElementById(`policy-${id}`)?.remove();
+    liabilityInsurancePolicies = liabilityInsurancePolicies.filter(item => item.id !== id);
+
+    if (liabilityInsurancePolicies.length === 0) {
+        document.getElementById('liability-insurance-list').innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No liability insurance policies added. Click "Add Policy" to track malpractice coverage.
+            </p>
+        `;
+    }
+}
+
+function getLiabilityInsurance() {
+    return liabilityInsurancePolicies.map(policy => ({
+        carrier: document.querySelector(`.policy-carrier[data-id="${policy.id}"]`)?.value || '',
+        policyNumber: document.querySelector(`.policy-number[data-id="${policy.id}"]`)?.value || '',
+        coverageAmount: document.querySelector(`.policy-coverage[data-id="${policy.id}"]`)?.value || '',
+        policyType: document.querySelector(`.policy-type[data-id="${policy.id}"]`)?.value || 'Claims-Made',
+        effectiveDate: document.querySelector(`.policy-effective[data-id="${policy.id}"]`)?.value || '',
+        expirationDate: document.querySelector(`.policy-expiration[data-id="${policy.id}"]`)?.value || ''
+    })).filter(p => p.carrier);
+}
+
+// Professional References Management
+function addProfessionalReference() {
+    const list = document.getElementById('professional-references-list');
+    const id = Date.now();
+
+    const refHtml = `
+        <div id="reference-${id}" style="padding: 1rem; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 0.75rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.9375rem; font-weight: 600; color: #1e293b; margin: 0;">Reference #${professionalReferences.length + 1}</h4>
+                <button type="button" onclick="removeProfessionalReference(${id})" class="btn-danger btn-small">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Remove
+                </button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Name <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="reference-name" data-id="${id}" placeholder="Reference name" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" required />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Title/Specialty</label>
+                    <input type="text" class="reference-title" data-id="${id}" placeholder="e.g., Cardiologist" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Organization</label>
+                    <input type="text" class="reference-org" data-id="${id}" placeholder="Hospital/Practice" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Relationship</label>
+                    <input type="text" class="reference-relationship" data-id="${id}" placeholder="e.g., Colleague, Supervisor" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Phone</label>
+                    <input type="tel" class="reference-phone" data-id="${id}" placeholder="Phone number" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+                <div class="form-group">
+                    <label style="font-size: 0.875rem; font-weight: 500; color: #64748b;">Email</label>
+                    <input type="email" class="reference-email" data-id="${id}" placeholder="Email address" style="padding: 0.5rem; border: 1px solid #e2e8f0; border-radius: 6px;" />
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (professionalReferences.length === 0) {
+        list.innerHTML = refHtml;
+    } else {
+        list.insertAdjacentHTML('beforeend', refHtml);
+    }
+
+    professionalReferences.push({ id });
+}
+
+function removeProfessionalReference(id) {
+    document.getElementById(`reference-${id}`)?.remove();
+    professionalReferences = professionalReferences.filter(item => item.id !== id);
+
+    if (professionalReferences.length === 0) {
+        document.getElementById('professional-references-list').innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+                No professional references added. Click "Add Reference" to add reference contacts.
+            </p>
+        `;
+    }
+}
+
+function getProfessionalReferences() {
+    return professionalReferences.map(ref => ({
+        name: document.querySelector(`.reference-name[data-id="${ref.id}"]`)?.value || '',
+        title: document.querySelector(`.reference-title[data-id="${ref.id}"]`)?.value || '',
+        organization: document.querySelector(`.reference-org[data-id="${ref.id}"]`)?.value || '',
+        relationship: document.querySelector(`.reference-relationship[data-id="${ref.id}"]`)?.value || '',
+        phone: document.querySelector(`.reference-phone[data-id="${ref.id}"]`)?.value || '',
+        email: document.querySelector(`.reference-email[data-id="${ref.id}"]`)?.value || ''
+    })).filter(r => r.name);
+}
+
 function showProviderModal() {
     document.getElementById('provider-modal-title').textContent = 'Add Provider';
     document.getElementById('provider-form').reset();
@@ -1877,6 +2194,38 @@ function showProviderModal() {
         </p>
     `;
 
+    // Reset hospital affiliations
+    hospitalAffiliations = [];
+    document.getElementById('hospital-affiliations-list').innerHTML = `
+        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+            No hospital affiliations added. Click "Add Affiliation" to track hospital privileges.
+        </p>
+    `;
+
+    // Reset credentialing contacts
+    credentialingContacts = [];
+    document.getElementById('credentialing-contacts-list').innerHTML = `
+        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+            No credentialing contacts added. Click "Add Contact" to add primary source verification contacts.
+        </p>
+    `;
+
+    // Reset liability insurance
+    liabilityInsurancePolicies = [];
+    document.getElementById('liability-insurance-list').innerHTML = `
+        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+            No liability insurance policies added. Click "Add Policy" to track malpractice coverage.
+        </p>
+    `;
+
+    // Reset professional references
+    professionalReferences = [];
+    document.getElementById('professional-references-list').innerHTML = `
+        <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem; border: 1px dashed #e2e8f0; border-radius: 8px;">
+            No professional references added. Click "Add Reference" to add reference contacts.
+        </p>
+    `;
+
     document.getElementById('provider-modal').classList.add('active');
 }
 
@@ -1892,6 +2241,10 @@ function saveProvider(event) {
     const lastName = document.getElementById('provider-last-name').value;
     const licenses = getProviderLicenses();
     const practiceLocations = getProviderLocations();
+    const affiliations = getHospitalAffiliations();
+    const contacts = getCredentialingContacts();
+    const insurancePolicies = getLiabilityInsurance();
+    const references = getProfessionalReferences();
 
     const providerData = {
         id: id || `PROV-${String(providers.length + 1).padStart(3, '0')}`,
@@ -1911,6 +2264,22 @@ function saveProvider(event) {
         // Licenses and Locations
         licenses: licenses,
         practiceLocations: practiceLocations,
+        // Hospital Affiliations
+        hospitalAffiliations: affiliations,
+        // Credentialing Contacts
+        credentialingContacts: contacts,
+        // Professional Liability Insurance
+        liabilityInsurance: insurancePolicies,
+        // Professional References
+        professionalReferences: references,
+        // Disclosures
+        disclosures: {
+            sanctionsDisclosed: document.getElementById('provider-sanctions-disclosed').checked,
+            malpracticeDisclosed: document.getElementById('provider-malpractice-disclosed').checked,
+            felonyDisclosed: document.getElementById('provider-felony-disclosed').checked,
+            disclosureNotes: document.getElementById('provider-disclosures-notes').value
+        },
+        // Legacy fields
         archivedLicenses: [],
         payerEnrollments: [],
         documents: [],
