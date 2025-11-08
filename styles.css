@@ -604,8 +604,9 @@ form {
     text-transform: uppercase;
 }
 
-/* Providers, Payers, Enrollments Grids */
+/* Providers, Payers, Enrollments, Locations Grids */
 .providers-grid,
+.locations-grid,
 .payers-grid,
 .enrollments-grid {
     display: grid;
@@ -614,6 +615,7 @@ form {
 }
 
 .provider-card,
+.location-card,
 .payer-card,
 .enrollment-card {
     background: white;
@@ -624,6 +626,7 @@ form {
 }
 
 .provider-card:hover,
+.location-card:hover,
 .payer-card:hover,
 .enrollment-card:hover {
     transform: translateY(-4px);
@@ -724,4 +727,9 @@ textarea:focus {
 .status-suspended {
     background-color: #f8d7da;
     color: #721c24;
+}
+
+.status-under-construction {
+    background-color: #fff3cd;
+    color: #856404;
 }

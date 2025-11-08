@@ -3,6 +3,7 @@ let credentials = [];
 let users = [];
 let currentUser = null;
 let providers = [];
+let locations = [];
 let payers = [];
 let enrollments = [];
 
@@ -12,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     loadCredentials();
     loadProviders();
+    loadLocations();
     loadPayers();
     loadEnrollments();
 });
@@ -377,6 +379,8 @@ function showView(viewName) {
     // Render content for specific views
     if (viewName === 'providers') {
         renderProviders();
+    } else if (viewName === 'locations') {
+        renderLocations();
     } else if (viewName === 'payers') {
         renderPayers();
     } else if (viewName === 'enrollments') {
@@ -724,6 +728,155 @@ function deleteProvider(id) {
     }
 }
 
+// === Location Management ===
+
+function loadLocations() {
+    const stored = localStorage.getItem('locations');
+    if (stored) {
+        locations = JSON.parse(stored);
+    } else {
+        locations = [
+            {
+                id: 'LOC-001',
+                name: 'Memorial Hospital - Main Campus',
+                type: 'Hospital',
+                address: '123 Medical Center Drive',
+                city: 'Los Angeles',
+                state: 'CA',
+                zip: '90001',
+                phone: '(310) 555-1234',
+                status: 'Active'
+            },
+            {
+                id: 'LOC-002',
+                name: 'Downtown Medical Clinic',
+                type: 'Clinic',
+                address: '456 Health Street',
+                city: 'New York',
+                state: 'NY',
+                zip: '10001',
+                phone: '(212) 555-5678',
+                status: 'Active'
+            }
+        ];
+        saveLocations();
+    }
+}
+
+function saveLocations() {
+    localStorage.setItem('locations', JSON.stringify(locations));
+}
+
+function renderLocations() {
+    const container = document.getElementById('locations-list');
+
+    if (locations.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <h2>No locations found</h2>
+                <p>Click "Add Location" to add your first location.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = locations.map(location => `
+        <div class="location-card">
+            <div class="card-header">
+                <span class="card-id">${location.id}</span>
+                <span class="credential-status status-${location.status.toLowerCase().replace(' ', '-')}">${location.status}</span>
+            </div>
+            <div class="card-title">${location.name}</div>
+            <span class="card-subtitle">${location.type}</span>
+            <div class="card-details">
+                <div class="card-detail">
+                    <span class="detail-label">Address:</span>
+                    <span class="detail-value">${location.address}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">City/State:</span>
+                    <span class="detail-value">${location.city}, ${location.state} ${location.zip}</span>
+                </div>
+                <div class="card-detail">
+                    <span class="detail-label">Phone:</span>
+                    <span class="detail-value">${location.phone}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn btn-primary btn-small" onclick="editLocation('${location.id}')">Edit</button>
+                <button class="btn btn-danger btn-small" onclick="deleteLocation('${location.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showLocationModal() {
+    document.getElementById('location-modal-title').textContent = 'Add Location';
+    document.getElementById('location-form').reset();
+    document.getElementById('location-edit-id').value = '';
+    document.getElementById('location-modal').classList.add('active');
+}
+
+function closeLocationModal() {
+    document.getElementById('location-modal').classList.remove('active');
+}
+
+function saveLocation(event) {
+    event.preventDefault();
+
+    const id = document.getElementById('location-edit-id').value;
+    const locationData = {
+        id: id || `LOC-${String(locations.length + 1).padStart(3, '0')}`,
+        name: document.getElementById('location-name').value,
+        type: document.getElementById('location-type').value,
+        address: document.getElementById('location-address').value,
+        city: document.getElementById('location-city').value,
+        state: document.getElementById('location-state').value,
+        zip: document.getElementById('location-zip').value,
+        phone: document.getElementById('location-phone').value,
+        status: document.getElementById('location-status').value
+    };
+
+    if (id) {
+        const index = locations.findIndex(l => l.id === id);
+        if (index !== -1) {
+            locations[index] = locationData;
+        }
+    } else {
+        locations.push(locationData);
+    }
+
+    saveLocations();
+    renderLocations();
+    closeLocationModal();
+}
+
+function editLocation(id) {
+    const location = locations.find(l => l.id === id);
+    if (!location) return;
+
+    document.getElementById('location-modal-title').textContent = 'Edit Location';
+    document.getElementById('location-edit-id').value = location.id;
+    document.getElementById('location-name').value = location.name;
+    document.getElementById('location-type').value = location.type;
+    document.getElementById('location-address').value = location.address;
+    document.getElementById('location-city').value = location.city;
+    document.getElementById('location-state').value = location.state;
+    document.getElementById('location-zip').value = location.zip;
+    document.getElementById('location-phone').value = location.phone;
+    document.getElementById('location-status').value = location.status;
+
+    document.getElementById('location-modal').classList.add('active');
+}
+
+function deleteLocation(id) {
+    if (confirm('Are you sure you want to delete this location?')) {
+        locations = locations.filter(l => l.id !== id);
+        saveLocations();
+        renderLocations();
+    }
+}
+
 // === Payer Management ===
 
 function loadPayers() {
@@ -1038,7 +1191,7 @@ function deleteEnrollment(id) {
 
 // Close modal when clicking outside
 window.onclick = function(event) {
-    const modals = ['credential-modal', 'provider-modal', 'payer-modal', 'enrollment-modal'];
+    const modals = ['credential-modal', 'provider-modal', 'location-modal', 'payer-modal', 'enrollment-modal'];
     modals.forEach(modalId => {
         const modal = document.getElementById(modalId);
         if (event.target === modal) {
