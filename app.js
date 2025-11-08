@@ -2866,13 +2866,24 @@ function renderPayers() {
     const container = document.getElementById('payers-list');
     if (!container) return;
 
+    console.log('💳 Rendering payers view...');
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
+
     if (payers.length === 0) {
         container.innerHTML = '<div class="coming-soon">No payers found.</div>';
         return;
     }
 
     container.innerHTML = payers.map(payer => {
-        const payerContracts = contracts.filter(c => c.payerId === payer.id && c.status !== 'Archived');
+        // Filter contracts by current organization AND payer
+        const payerContracts = currentOrganization ?
+            contracts.filter(c =>
+                c.payerId === payer.id &&
+                c.status !== 'Archived' &&
+                c.organizationId === currentOrganization.id
+            ) :
+            contracts.filter(c => c.payerId === payer.id && c.status !== 'Archived');
+
         return `
             <div class="payer-card" onclick="viewPayerDetail('${payer.id}')">
                 <div class="card-header">
@@ -2885,7 +2896,7 @@ function renderPayers() {
                 </div>
                 <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem;">
                     <div>Payer ID: <span style="font-weight: 500; color: #1e293b;">${payer.payerId}</span></div>
-                    <div>📄 ${payerContracts.length} Active Contract${payerContracts.length !== 1 ? 's' : ''}</div>
+                    <div>📄 ${payerContracts.length} Active Contract${payerContracts.length !== 1 ? 's' : ''}${currentOrganization ? ` for ${currentOrganization.name}` : ''}</div>
                 </div>
                 <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">
                     <button class="btn btn-primary btn-small" onclick="event.stopPropagation(); editPayer('${payer.id}')">Edit</button>
@@ -3446,6 +3457,9 @@ function closeContractModal() {
 function saveContract(event) {
     event.preventDefault();
 
+    console.log('💼 ========== SAVE CONTRACT CALLED ==========');
+    console.log('💼 Current Organization at time of save:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'NULL - THIS IS A PROBLEM!');
+
     const id = document.getElementById('contract-edit-id').value;
     const identifiers = getContractIdentifiers();
 
@@ -3464,8 +3478,12 @@ function saveContract(event) {
         documentFile = file.name;
     }
 
+    const assignedOrgId = currentOrganization ? currentOrganization.id : null;
+    console.log('💼 Assigning organizationId:', assignedOrgId);
+
     const contractData = {
         id: id || `CONTRACT-${String(contracts.length + 1).padStart(3, '0')}`,
+        organizationId: assignedOrgId,
         payerId: document.getElementById('contract-payer-id').value || null,
         payerName: document.getElementById('contract-payer-name').value,
         contractName: document.getElementById('contract-name').value,
@@ -3494,11 +3512,23 @@ function saveContract(event) {
     if (id) {
         const index = contracts.findIndex(c => c.id === id);
         if (index !== -1) {
+            // Preserve organizationId when editing
+            const existingContract = contracts[index];
+            contractData.organizationId = existingContract.organizationId || contractData.organizationId;
             contracts[index] = contractData;
+            console.log('💼 Updated existing contract at index', index);
         }
     } else {
         contracts.push(contractData);
+        console.log('💼 Added new contract to array');
     }
+
+    console.log('💼 Final contract data:', {
+        id: contractData.id,
+        contractName: contractData.contractName,
+        organizationId: contractData.organizationId,
+        payerName: contractData.payerName
+    });
 
     saveContracts();
     closeContractModal();
@@ -3509,6 +3539,7 @@ function saveContract(event) {
     } else {
         renderPayers();
     }
+    console.log('💼 ========== SAVE COMPLETE ==========');
 }
 
 function editContract(contractId) {
@@ -3611,7 +3642,20 @@ function viewPayerDetail(payerId) {
     selectedPayer = payers.find(p => p.id === payerId);
     if (!selectedPayer) return;
 
-    const payerContracts = contracts.filter(c => c.payerId === payerId && c.status !== 'Archived');
+    console.log('💳 Viewing payer detail for:', selectedPayer.name);
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
+
+    // Filter contracts by organization AND payer
+    const payerContracts = currentOrganization ?
+        contracts.filter(c =>
+            c.payerId === payerId &&
+            c.status !== 'Archived' &&
+            c.organizationId === currentOrganization.id
+        ) :
+        contracts.filter(c => c.payerId === payerId && c.status !== 'Archived');
+
+    console.log('   Contracts found for this organization:', payerContracts.length);
+
     const detailView = document.getElementById('payer-detail-view');
 
     detailView.innerHTML = `

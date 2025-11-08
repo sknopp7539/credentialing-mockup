@@ -70,6 +70,7 @@
         <div style="margin-bottom: 2rem;">
             <button class="btn" onclick="loadData()">Refresh Data</button>
             <button class="btn" onclick="fixProviderOrganizations()">Fix Provider Organization IDs</button>
+            <button class="btn" onclick="fixContractOrganizations()">Fix Contract Organization IDs</button>
             <button class="btn btn-danger" onclick="clearProviders()">Clear All Providers</button>
             <button class="btn" onclick="window.location.href='index.html'">Back to App</button>
         </div>
@@ -190,6 +191,47 @@
                 }, 500);
             } else {
                 alert('No providers needed fixing. All providers already have valid organization IDs.');
+            }
+        }
+
+        function fixContractOrganizations() {
+            const currentOrgData = localStorage.getItem('pvCurrentOrganization');
+            if (!currentOrgData) {
+                alert('No current organization found. Please select an organization in the main app first.');
+                return;
+            }
+
+            const currentOrg = JSON.parse(currentOrgData);
+            const contractsData = localStorage.getItem('pvContracts');
+
+            if (!contractsData) {
+                alert('No contracts found to fix.');
+                return;
+            }
+
+            const contracts = JSON.parse(contractsData);
+            let fixedCount = 0;
+            const fixedContracts = [];
+
+            contracts.forEach(contract => {
+                if (!contract.organizationId || contract.organizationId === 'null' || contract.organizationId === null) {
+                    contract.organizationId = currentOrg.id;
+                    fixedCount++;
+                    fixedContracts.push(contract.contractName || contract.payerName);
+                }
+            });
+
+            if (fixedCount > 0) {
+                localStorage.setItem('pvContracts', JSON.stringify(contracts));
+                const message = `✓ Fixed ${fixedCount} contract(s) and assigned them to "${currentOrg.name}":\n${fixedContracts.join(', ')}`;
+                document.getElementById('fix-message').style.display = 'block';
+                document.getElementById('fix-message').innerHTML = '<strong>Success!</strong> ' + message.replace(/\n/g, '<br>');
+                loadData();
+                setTimeout(() => {
+                    alert('Contracts fixed! Go back to the main app and refresh the page (Ctrl+Shift+R) to see the changes.');
+                }, 500);
+            } else {
+                alert('No contracts needed fixing. All contracts already have valid organization IDs.');
             }
         }
 
