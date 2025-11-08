@@ -966,12 +966,30 @@ function saveLocations() {
 
 // ===== DASHBOARD =====
 function updateDashboard() {
+    console.log('📊 Updating dashboard...');
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None');
+
+    // Filter data by current organization
+    const orgProviders = currentOrganization ?
+        providers.filter(p => p.organizationId === currentOrganization.id) :
+        providers;
+
+    const orgEnrollments = currentOrganization ?
+        enrollments.filter(e => {
+            const provider = providers.find(p => p.id === e.providerId);
+            return provider && provider.organizationId === currentOrganization.id;
+        }) :
+        enrollments;
+
+    console.log('   Providers in org:', orgProviders.length);
+    console.log('   Enrollments in org:', orgEnrollments.length);
+
     // Update stats
-    document.getElementById('total-providers').textContent = providers.length;
-    document.getElementById('total-enrollments').textContent = enrollments.length;
+    document.getElementById('total-providers').textContent = orgProviders.length;
+    document.getElementById('total-enrollments').textContent = orgEnrollments.length;
     document.getElementById('pending-credentialing').textContent =
-        providers.filter(p => p.status === 'Pending').length;
-    document.getElementById('open-claims').textContent = '1';
+        orgProviders.filter(p => p.status === 'Pending').length;
+    document.getElementById('open-claims').textContent = '0'; // Calculate based on org data
 
     // Populate expirations table
     renderExpirationsTable();
