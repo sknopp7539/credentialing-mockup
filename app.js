@@ -3374,6 +3374,15 @@ function renderEnrollments() {
 }
 
 function showEnrollmentModal() {
+    // ✅ DEFENSIVE CHECK: Ensure organization is selected
+    if (!currentOrganization) {
+        alert('⚠️ Please select an organization first from the dropdown in the top bar.');
+        console.error('❌ Cannot open enrollment modal: No organization selected');
+        return;
+    }
+
+    console.log('🎯 Opening enrollment modal for organization:', currentOrganization.name, `(ID: ${currentOrganization.id})`);
+
     document.getElementById('enrollment-modal-title').textContent = 'Add Enrollment';
     document.getElementById('enrollment-form').reset();
     document.getElementById('enrollment-edit-id').value = '';
@@ -3389,14 +3398,30 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
+    // ✅ DETAILED LOGGING: Show filtering process
+    console.log('🔍 Filtering providers for organization:',
+        currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None (showing all)');
+    console.log('   Total providers in system:', providers.length);
+
     // Only show providers from current organization
     const orgProviders = currentOrganization ?
-        providers.filter(p => p.organizationId === currentOrganization.id) :
+        providers.filter(p => {
+            const matches = p.organizationId === currentOrganization.id;
+            const providerName = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
+            const providerOrg = organizations.find(o => o.id === p.organizationId);
+
+            console.log(`   Provider ${providerName}: organizationId=${p.organizationId} (${providerOrg ? providerOrg.name : 'Unknown Org'}), matches=${matches ? '✓' : '✗'}`);
+
+            return matches;
+        }) :
         providers;
 
-    // Log only if there's a potential issue
+    console.log(`✅ Found ${orgProviders.length} provider(s) for ${currentOrganization ? currentOrganization.name : 'all organizations'}`);
+
+    // Warn if no providers found
     if (orgProviders.length === 0 && currentOrganization) {
         console.warn(`⚠️ No providers found for ${currentOrganization.name}`);
+        console.warn('   This means there are no providers with organizationId =', currentOrganization.id);
     }
 
     providerSelect.innerHTML = '<option value="">Select Provider</option>' +
@@ -3449,11 +3474,25 @@ function saveEnrollment(event) {
     const provider = providers.find(p => p.id === providerId);
     if (!provider) {
         alert('Please select a valid provider');
+        console.error('❌ Enrollment validation failed: Provider not found');
         return;
     }
 
     if (currentOrganization && provider.organizationId !== currentOrganization.id) {
-        alert(`This provider does not belong to ${currentOrganization.name}. Please select a provider from the current organization.`);
+        const providerOrg = organizations.find(o => o.id === provider.organizationId);
+        const providerName = `${provider.firstName || ''} ${provider.lastName || ''}`.trim() || provider.name;
+
+        const errorMessage = `❌ Provider Validation Failed\n\n` +
+            `Provider: ${providerName}\n` +
+            `Provider's Organization: ${providerOrg ? providerOrg.name : 'Unknown'}\n` +
+            `Selected Organization: ${currentOrganization.name}\n\n` +
+            `This provider cannot be enrolled because they belong to a different organization.`;
+
+        alert(errorMessage);
+        console.error('❌ Provider organization mismatch:');
+        console.error('   Provider:', providerName);
+        console.error('   Provider organizationId:', provider.organizationId, `(${providerOrg ? providerOrg.name : 'Unknown'})`);
+        console.error('   Current organization:', currentOrganization.id, `(${currentOrganization.name})`);
         return;
     }
 
@@ -3515,6 +3554,65 @@ function deleteEnrollment(id) {
         renderEnrollments();
     }
 }
+
+// ===== DEBUG HELPER FUNCTION =====
+function debugEnrollmentOrganizationState() {
+    console.log('═══════════════════════════════════════════════════════');
+    console.log('🔍 ENROLLMENT ORGANIZATION DEBUG STATE');
+    console.log('═══════════════════════════════════════════════════════');
+    console.log('');
+    console.log('📊 Current Organization:');
+    if (currentOrganization) {
+        console.log('   ✅ Organization Selected:', currentOrganization.name);
+        console.log('   ID:', currentOrganization.id);
+        console.log('   Full Object:', currentOrganization);
+    } else {
+        console.log('   ❌ No organization selected');
+    }
+    console.log('');
+    console.log('👥 All Providers by Organization:');
+    organizations.forEach(org => {
+        const orgProviders = providers.filter(p => p.organizationId === org.id);
+        console.log(`   ${org.name} (${org.id}):`);
+        if (orgProviders.length === 0) {
+            console.log('      ⚠️ No providers');
+        } else {
+            orgProviders.forEach(p => {
+                const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
+                console.log(`      • ${name} (${p.id})`);
+            });
+        }
+    });
+    console.log('');
+    console.log('📋 Enrollment Modal State:');
+    const modal = document.getElementById('enrollment-modal');
+    const providerSelect = document.getElementById('enrollment-provider');
+    console.log('   Modal Open:', modal && modal.classList.contains('active') ? 'Yes' : 'No');
+    console.log('   Provider Options Count:', providerSelect ? providerSelect.options.length - 1 : 'N/A');
+    if (providerSelect && providerSelect.options.length > 1) {
+        console.log('   Available Providers:');
+        Array.from(providerSelect.options).forEach((opt, idx) => {
+            if (idx > 0) { // Skip "Select Provider" option
+                console.log(`      • ${opt.text} (${opt.value})`);
+            }
+        });
+    }
+    console.log('');
+    console.log('💾 LocalStorage State:');
+    const storedOrg = localStorage.getItem('pvCurrentOrganization');
+    if (storedOrg) {
+        const parsed = JSON.parse(storedOrg);
+        console.log('   Stored Organization:', parsed.name, `(${parsed.id})`);
+    } else {
+        console.log('   ⚠️ No organization in localStorage');
+    }
+    console.log('═══════════════════════════════════════════════════════');
+    console.log('💡 To test: Run debugEnrollmentOrganizationState() in console anytime');
+    console.log('═══════════════════════════════════════════════════════');
+}
+
+// Make debug function globally available
+window.debugEnrollmentOrganizationState = debugEnrollmentOrganizationState;
 
 // ===== LOCATIONS =====
 function renderLocations() {
