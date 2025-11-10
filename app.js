@@ -3403,22 +3403,36 @@ function populateEnrollmentDropdowns() {
         providers.filter(p => p.organizationId === currentOrganization.id) :
         providers;
 
-    // 🚨 DEBUG ALERT: Show filtering info directly in UI
-    const debugInfo = `
-FILTERING DEBUG:
-Current Org: ${currentOrganization ? currentOrganization.name + ' (' + currentOrganization.id + ')' : 'None'}
-Total Providers: ${providers.length}
-Filtered Providers: ${orgProviders.length}
+    // 🚨 DEBUG: Add visual debug display to modal
+    const modal = document.getElementById('enrollment-modal');
+    const form = document.getElementById('enrollment-form');
 
-Providers being shown:
-${orgProviders.map(p => {
-    const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
-    return `- ${name} (ID: ${p.id}, OrgID: ${p.organizationId})`;
-}).join('\n')}
-    `.trim();
+    // Remove old debug display if exists
+    const oldDebug = modal.querySelector('.debug-info');
+    if (oldDebug) oldDebug.remove();
 
-    // Show alert with debug info
-    alert(debugInfo);
+    // Create debug display
+    const debugDiv = document.createElement('div');
+    debugDiv.className = 'debug-info';
+    debugDiv.style.cssText = 'background: #fef3c7; border: 2px solid #f59e0b; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; font-family: monospace; font-size: 12px;';
+
+    const allProvidersInfo = providers.map(p => {
+        const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
+        const matches = currentOrganization && p.organizationId === currentOrganization.id;
+        return `${matches ? '✓' : '✗'} ${name} (OrgID: ${p.organizationId})`;
+    }).join('<br>');
+
+    debugDiv.innerHTML = `
+        <strong style="color: #92400e;">🔍 FILTERING DEBUG:</strong><br>
+        <strong>Current Org:</strong> ${currentOrganization ? currentOrganization.name + ' (' + currentOrganization.id + ')' : 'None'}<br>
+        <strong>Total Providers:</strong> ${providers.length}<br>
+        <strong>Filtered Providers:</strong> ${orgProviders.length}<br>
+        <br>
+        <strong>All Providers (✓ = should show):</strong><br>
+        ${allProvidersInfo}
+    `;
+
+    form.insertBefore(debugDiv, form.firstChild);
 
     // Populate provider dropdown
     providerSelect.innerHTML = '<option value="">Select Provider</option>' +
