@@ -276,24 +276,6 @@ body {
     color: #1e293b;
 }
 
-.btn-reset {
-    padding: 0.5rem 1rem;
-    background-color: #fee2e2;
-    border: none;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #dc2626;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-right: 0.5rem;
-}
-
-.btn-reset:hover {
-    background-color: #fecaca;
-    color: #991b1b;
-}
-
 /* ===== VIEWS ===== */
 .view {
     display: none;
