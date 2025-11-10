@@ -146,8 +146,8 @@ function loadOrganizations() {
         organizations = [
             {
                 id: 'ORG-001',
-                name: 'Metropolitan Healthcare Group',
-                dba: ['City Medical Center', 'Metro Health Services'],
+                name: 'Gamboa Medical Group',
+                dba: ['Gamboa Health Services'],
                 corporateAddress: {
                     street: '1500 Healthcare Blvd',
                     city: 'New York',
@@ -165,27 +165,20 @@ function loadOrganizations() {
                 authorizedOfficials: [
                     {
                         id: 1,
-                        name: 'Robert Williams',
+                        name: 'Dr. Maria Gamboa',
                         title: 'Chief Executive Officer',
-                        email: 'robert.williams@metrohealthcare.com',
+                        email: 'maria.gamboa@gamboamedical.com',
                         phone: '(555) 100-0001'
-                    },
-                    {
-                        id: 2,
-                        name: 'Sarah Martinez',
-                        title: 'Chief Medical Officer',
-                        email: 'sarah.martinez@metrohealthcare.com',
-                        phone: '(555) 100-0002'
                     }
                 ],
                 primaryContact: {
-                    name: 'Jennifer Lee',
-                    title: 'Director of Operations',
-                    email: 'jennifer.lee@metrohealthcare.com',
+                    name: 'Dr. Maria Gamboa',
+                    title: 'CEO',
+                    email: 'maria.gamboa@gamboamedical.com',
                     phone: '(555) 100-0010',
                     fax: '(555) 100-0011'
                 },
-                website: 'https://www.metrohealthcare.com',
+                website: 'https://www.gamboamedical.com',
                 status: 'Active',
                 createdAt: '2024-01-15'
             },
