@@ -1114,6 +1114,72 @@ function updateDashboard() {
 
     // Populate expirations table
     renderExpirationsTable();
+
+    // Populate recent claims widget
+    renderRecentClaimsWidget(orgClaims);
+}
+
+function renderRecentClaimsWidget(orgClaims) {
+    const widget = document.getElementById('recent-claims-widget');
+    if (!widget) return;
+
+    console.log('📊 Rendering recent claims widget...');
+    console.log('   Claims in org:', orgClaims.length);
+
+    // Get the 3 most recent claims
+    const recentClaims = orgClaims
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 3);
+
+    if (recentClaims.length === 0) {
+        widget.innerHTML = `
+            <p style="text-align: center; padding: 1.5rem; color: #94a3b8; font-size: 0.875rem;">
+                ${currentOrganization ?
+                    `No claims found for ${currentOrganization.name}.` :
+                    'No claims found. Select an organization to view claims.'}
+            </p>
+        `;
+        return;
+    }
+
+    widget.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            ${recentClaims.map(claim => {
+                const provider = providers.find(p => p.id === claim.providerId);
+                const providerName = provider ?
+                    `${provider.firstName || ''} ${provider.lastName || ''}`.trim() || provider.name || 'Unknown' :
+                    'Unknown Provider';
+
+                const statusColors = {
+                    'open': { bg: '#fee2e2', text: '#991b1b' },
+                    'pending': { bg: '#fef3c7', text: '#92400e' },
+                    'settled': { bg: '#d1fae5', text: '#065f46' },
+                    'closed': { bg: '#e0e7ff', text: '#3730a3' }
+                };
+                const colors = statusColors[claim.status] || { bg: '#f1f5f9', text: '#475569' };
+
+                return `
+                    <div style="padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #fafafa; transition: all 0.2s; cursor: pointer;"
+                         onclick="showView('claims')"
+                         onmouseover="this.style.background='#f1f5f9'; this.style.borderColor='#cbd5e1';"
+                         onmouseout="this.style.background='#fafafa'; this.style.borderColor='#e2e8f0';">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div style="font-weight: 600; font-size: 0.875rem; color: #1e293b;">${claim.claimId}</div>
+                            <span style="padding: 0.125rem 0.5rem; font-size: 0.75rem; border-radius: 9999px; font-weight: 500; background: ${colors.bg}; color: ${colors.text};">
+                                ${claim.status.charAt(0).toUpperCase() + claim.status.slice(1)}
+                            </span>
+                        </div>
+                        <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.25rem;">
+                            Provider: <span style="color: #1e293b; font-weight: 500;">${providerName}</span>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #94a3b8;">
+                            Incident: ${claim.incidentDate ? new Date(claim.incidentDate).toLocaleDateString() : 'N/A'}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
 function renderExpirationsTable() {
@@ -3638,6 +3704,7 @@ function loadContracts() {
         contracts = [
             {
                 id: 'CONTRACT-001',
+                organizationId: 'ORG-001',
                 payerId: 'PAY-001',
                 payerName: 'Blue Cross Blue Shield',
                 contractName: 'PPO Network Agreement',
@@ -3662,6 +3729,144 @@ function loadContracts() {
                 documentUrl: 'https://docs.bcbs.com/contract-2024.pdf',
                 notes: 'Annual contract with standard terms',
                 createdAt: '2024-01-15'
+            },
+            {
+                id: 'CONTRACT-002',
+                organizationId: 'ORG-001',
+                payerId: 'PAY-002',
+                payerName: 'Aetna',
+                contractName: 'HMO Agreement',
+                identifiers: [
+                    { type: 'Contract Number', value: 'AET-2024-001' },
+                    { type: 'Network ID', value: 'NET-67890' }
+                ],
+                contactName: 'Robert Johnson',
+                email: 'r.johnson@aetna.com',
+                phone: '(555) 234-5678',
+                fax: '(555) 234-5679',
+                streetAddress: '456 Health Blvd',
+                city: 'Hartford',
+                state: 'CT',
+                zipCode: '06103',
+                effectiveDate: '2024-02-01',
+                expirationDate: '2025-12-31',
+                status: 'Active',
+                website: 'https://www.aetna.com',
+                productLines: 'HMO, PPO',
+                feeScheduleUrl: 'https://www.aetna.com/fee-schedule',
+                documentUrl: null,
+                notes: 'Standard HMO network contract',
+                createdAt: '2024-02-01'
+            },
+            {
+                id: 'CONTRACT-003',
+                organizationId: 'ORG-001',
+                payerId: 'PAY-003',
+                payerName: 'Medicare',
+                contractName: 'Medicare Provider Agreement',
+                identifiers: [
+                    { type: 'PTAN', value: 'PTAN123456' }
+                ],
+                contactName: 'Medicare Admin',
+                email: 'provider@medicare.gov',
+                phone: '(555) 345-6789',
+                fax: '(555) 345-6780',
+                streetAddress: '789 Federal Plaza',
+                city: 'Baltimore',
+                state: 'MD',
+                zipCode: '21244',
+                effectiveDate: '2024-01-01',
+                expirationDate: '2026-12-31',
+                status: 'Active',
+                website: 'https://www.medicare.gov',
+                productLines: 'Medicare Part A, Part B',
+                feeScheduleUrl: 'https://www.cms.gov/fee-schedule',
+                documentUrl: null,
+                notes: 'Federal Medicare agreement',
+                createdAt: '2024-01-01'
+            },
+            {
+                id: 'CONTRACT-004',
+                organizationId: 'ORG-003',
+                payerId: 'PAY-001',
+                payerName: 'Blue Cross Blue Shield',
+                contractName: 'PPO Network Agreement - Texas',
+                identifiers: [
+                    { type: 'Contract Number', value: 'BCBS-TX-2024-003' },
+                    { type: 'Group ID', value: 'GRP-TX-78901' }
+                ],
+                contactName: 'Lisa Martinez',
+                email: 'lisa.martinez@bcbstx.com',
+                phone: '(555) 456-7890',
+                fax: '(555) 456-7891',
+                streetAddress: '1200 Insurance Way',
+                city: 'Dallas',
+                state: 'TX',
+                zipCode: '75201',
+                effectiveDate: '2024-03-01',
+                expirationDate: '2025-12-31',
+                status: 'Active',
+                website: 'https://www.bcbstx.com',
+                productLines: 'PPO, Medicare Advantage',
+                feeScheduleUrl: 'https://www.bcbstx.com/fee-schedule',
+                documentUrl: null,
+                notes: 'Texas regional contract for Knopp Medical',
+                createdAt: '2024-03-01'
+            },
+            {
+                id: 'CONTRACT-005',
+                organizationId: 'ORG-003',
+                payerId: 'PAY-003',
+                payerName: 'Medicare',
+                contractName: 'Medicare Provider Agreement',
+                identifiers: [
+                    { type: 'PTAN', value: 'PTAN789012' }
+                ],
+                contactName: 'Medicare Admin',
+                email: 'provider@medicare.gov',
+                phone: '(555) 345-6789',
+                fax: '(555) 345-6780',
+                streetAddress: '789 Federal Plaza',
+                city: 'Baltimore',
+                state: 'MD',
+                zipCode: '21244',
+                effectiveDate: '2024-03-01',
+                expirationDate: '2026-12-31',
+                status: 'Active',
+                website: 'https://www.medicare.gov',
+                productLines: 'Medicare Part A, Part B',
+                feeScheduleUrl: 'https://www.cms.gov/fee-schedule',
+                documentUrl: null,
+                notes: 'Federal Medicare agreement for Knopp Medical',
+                createdAt: '2024-03-01'
+            },
+            {
+                id: 'CONTRACT-006',
+                organizationId: 'ORG-002',
+                payerId: 'PAY-001',
+                payerName: 'Blue Cross Blue Shield',
+                contractName: 'PPO Network Agreement - California',
+                identifiers: [
+                    { type: 'Contract Number', value: 'BCBS-CA-2024-002' },
+                    { type: 'Group ID', value: 'GRP-CA-45678' }
+                ],
+                contactName: 'David Kim',
+                email: 'david.kim@bcbsca.com',
+                phone: '(555) 567-8901',
+                fax: '(555) 567-8902',
+                streetAddress: '800 Medical Center Dr',
+                city: 'Los Angeles',
+                state: 'CA',
+                zipCode: '90017',
+                effectiveDate: '2024-02-01',
+                expirationDate: '2025-12-31',
+                status: 'Active',
+                website: 'https://www.blueshieldca.com',
+                productLines: 'PPO, HMO',
+                feeScheduleUrl: 'https://www.blueshieldca.com/fee-schedule',
+                documentUrl: null,
+                notes: 'California regional contract for Coastal Medical',
+                createdAt: '2024-02-01'
             }
         ];
         saveContracts();
