@@ -3424,11 +3424,27 @@ function populateEnrollmentDropdowns() {
         console.warn('   This means there are no providers with organizationId =', currentOrganization.id);
     }
 
-    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
+    const dropdownHTML = '<option value="">Select Provider</option>' +
         orgProviders.map(p => {
             const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
             return `<option value="${p.id}">${name}</option>`;
         }).join('');
+
+    console.log('📝 Setting provider dropdown HTML...');
+    console.log('   Options being set:', orgProviders.map(p => {
+        const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
+        return `${name} (${p.id})`;
+    }).join(', ') || 'None');
+
+    providerSelect.innerHTML = dropdownHTML;
+
+    console.log('✓ Dropdown innerHTML set. Verifying...');
+    console.log('   Actual options in dropdown:', providerSelect.options.length - 1, 'providers');
+    Array.from(providerSelect.options).forEach((opt, idx) => {
+        if (idx > 0) {
+            console.log(`      ${idx}. ${opt.text} (value: ${opt.value})`);
+        }
+    });
 
     // Only show payers that have contracts with current organization
     const orgPayerIds = currentOrganization ?
