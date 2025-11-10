@@ -3403,6 +3403,11 @@ function populateEnrollmentDropdowns() {
         currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None (showing all)');
     console.log('   Total providers in system:', providers.length);
 
+    // Debug current organization ID type
+    if (currentOrganization) {
+        console.log('🔍 DEBUG: currentOrganization.id =', JSON.stringify(currentOrganization.id), 'Type:', typeof currentOrganization.id);
+    }
+
     // Only show providers from current organization
     const orgProviders = currentOrganization ?
         providers.filter(p => {
@@ -3410,7 +3415,12 @@ function populateEnrollmentDropdowns() {
             const providerName = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
             const providerOrg = organizations.find(o => o.id === p.organizationId);
 
-            console.log(`   Provider ${providerName}: organizationId=${p.organizationId} (${providerOrg ? providerOrg.name : 'Unknown Org'}), matches=${matches ? '✓' : '✗'}`);
+            // DEBUG: Show exact comparison values
+            console.log(`   Provider ${providerName}:`);
+            console.log(`      provider.organizationId = ${JSON.stringify(p.organizationId)} (type: ${typeof p.organizationId})`);
+            console.log(`      currentOrganization.id = ${JSON.stringify(currentOrganization.id)} (type: ${typeof currentOrganization.id})`);
+            console.log(`      === comparison = ${matches}`);
+            console.log(`      Result: ${matches ? '✓ MATCH' : '✗ NO MATCH'}`);
 
             return matches;
         }) :
