@@ -3285,10 +3285,24 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
+    console.log('🔍 ===== POPULATING ENROLLMENT DROPDOWNS =====');
+    console.log('   Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'NONE - THIS IS A PROBLEM!');
+    console.log('   Total providers in system:', providers.length);
+    console.log('   Total payers in system:', payers.length);
+    console.log('   Total contracts in system:', contracts.length);
+
+    // Validation check
+    if (!currentOrganization) {
+        console.error('❌ ERROR: No organization selected! Cannot filter properly.');
+        alert('Please select an organization before adding enrollments.');
+        return;
+    }
+
     // Only show providers from current organization
-    const orgProviders = currentOrganization ?
-        providers.filter(p => p.organizationId === currentOrganization.id) :
-        providers;
+    const orgProviders = providers.filter(p => p.organizationId === currentOrganization.id);
+
+    console.log('   Providers for', currentOrganization.name + ':', orgProviders.length);
+    console.log('   Provider IDs:', orgProviders.map(p => `${p.id} (${p.firstName} ${p.lastName})`));
 
     providerSelect.innerHTML = '<option value="">Select Provider</option>' +
         orgProviders.map(p => {
@@ -3297,11 +3311,15 @@ function populateEnrollmentDropdowns() {
         }).join('');
 
     // Only show payers that have contracts with current organization
-    const orgPayerIds = currentOrganization ?
-        contracts.filter(c => c.organizationId === currentOrganization.id).map(c => c.payerId) :
-        payers.map(p => p.id);
+    const orgContracts = contracts.filter(c => c.organizationId === currentOrganization.id);
+    console.log('   Contracts for', currentOrganization.name + ':', orgContracts.length);
+    console.log('   Contract details:', orgContracts.map(c => `${c.id} -> Payer: ${c.payerId} (${c.payerName})`));
+
+    const orgPayerIds = orgContracts.map(c => c.payerId);
+    console.log('   Payer IDs from contracts:', orgPayerIds);
 
     const availablePayers = payers.filter(p => orgPayerIds.includes(p.id));
+    console.log('   Available payers:', availablePayers.length, availablePayers.map(p => `${p.id} (${p.name})`));
 
     if (availablePayers.length === 0 && currentOrganization) {
         payerSelect.innerHTML = '<option value="">No payer contracts found for this organization</option>';
@@ -3327,6 +3345,9 @@ function populateEnrollmentDropdowns() {
         const existingWarning = document.getElementById('enrollment-modal').querySelector('.enrollment-warning');
         if (existingWarning) existingWarning.remove();
     }
+
+    console.log('✅ Enrollment dropdowns populated successfully');
+    console.log('===============================================');
 }
 
 function saveEnrollment(event) {
@@ -3638,6 +3659,7 @@ function loadContracts() {
         contracts = [
             {
                 id: 'CONTRACT-001',
+                organizationId: 'ORG-001',
                 payerId: 'PAY-001',
                 payerName: 'Blue Cross Blue Shield',
                 contractName: 'PPO Network Agreement',
