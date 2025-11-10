@@ -95,6 +95,58 @@ function logout() {
     document.querySelector('.nav-item[data-view="dashboard"]').classList.add('active');
 }
 
+// Reset all application data
+function resetAllData() {
+    if (!confirm('WARNING: This will permanently delete ALL data including organizations, providers, credentialing records, enrollments, contracts, locations, claims, and notifications. This action cannot be undone. Are you sure you want to continue?')) {
+        return;
+    }
+
+    // Double confirmation for safety
+    if (!confirm('Are you ABSOLUTELY sure? All data will be lost permanently.')) {
+        return;
+    }
+
+    // Clear all localStorage data
+    localStorage.removeItem('pvCurrentUser');
+    localStorage.removeItem('pvOrganizations');
+    localStorage.removeItem('pvCurrentOrganization');
+    localStorage.removeItem('pvProviders');
+    localStorage.removeItem('pvPayers');
+    localStorage.removeItem('pvEnrollments');
+    localStorage.removeItem('pvLocations');
+    localStorage.removeItem('pvContracts');
+    localStorage.removeItem('pvEmailNotifications');
+    localStorage.removeItem('pvClaims');
+
+    // Clear all in-memory arrays
+    providers = [];
+    payers = [];
+    enrollments = [];
+    locations = [];
+    contracts = [];
+    emailNotifications = [];
+    organizations = [];
+    claims = [];
+    currentOrganization = null;
+    currentUser = null;
+    selectedProvider = null;
+    selectedPayer = null;
+    contractIdentifiers = [];
+    authorizedOfficials = [];
+    dbaNames = [];
+    providerLicenses = [];
+    providerLocations = [];
+    hospitalAffiliations = [];
+    credentialingContacts = [];
+    liabilityInsurancePolicies = [];
+    professionalReferences = [];
+
+    alert('All data has been cleared successfully. The application will now reload.');
+
+    // Reload the page to start fresh
+    window.location.reload();
+}
+
 // ===== VIEW NAVIGATION =====
 function showView(viewName) {
     // Update nav buttons
