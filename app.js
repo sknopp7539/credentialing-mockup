@@ -3398,63 +3398,29 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
-    // ✅ DETAILED LOGGING: Show filtering process
-    console.log('🔍 Filtering providers for organization:',
-        currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'None (showing all)');
-    console.log('   Total providers in system:', providers.length);
-
-    // Debug current organization ID type
-    if (currentOrganization) {
-        console.log('🔍 DEBUG: currentOrganization.id =', JSON.stringify(currentOrganization.id), 'Type:', typeof currentOrganization.id);
-    }
+    // ✅ SIMPLIFIED LOGGING: Show filtering process
+    console.log('🔍 populateEnrollmentDropdowns() called for org:', currentOrganization ? currentOrganization.id : 'None');
 
     // Only show providers from current organization
     const orgProviders = currentOrganization ?
-        providers.filter(p => {
-            const matches = p.organizationId === currentOrganization.id;
-            const providerName = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
-            const providerOrg = organizations.find(o => o.id === p.organizationId);
-
-            // DEBUG: Show exact comparison values
-            console.log(`   Provider ${providerName}:`);
-            console.log(`      provider.organizationId = ${JSON.stringify(p.organizationId)} (type: ${typeof p.organizationId})`);
-            console.log(`      currentOrganization.id = ${JSON.stringify(currentOrganization.id)} (type: ${typeof currentOrganization.id})`);
-            console.log(`      === comparison = ${matches}`);
-            console.log(`      Result: ${matches ? '✓ MATCH' : '✗ NO MATCH'}`);
-
-            return matches;
-        }) :
+        providers.filter(p => p.organizationId === currentOrganization.id) :
         providers;
 
-    console.log(`✅ Found ${orgProviders.length} provider(s) for ${currentOrganization ? currentOrganization.name : 'all organizations'}`);
-
-    // Warn if no providers found
-    if (orgProviders.length === 0 && currentOrganization) {
-        console.warn(`⚠️ No providers found for ${currentOrganization.name}`);
-        console.warn('   This means there are no providers with organizationId =', currentOrganization.id);
+    // Show summary
+    console.log(`   Filtered: ${orgProviders.length} of ${providers.length} providers`);
+    if (orgProviders.length > 0) {
+        console.log('   Providers:', orgProviders.map(p => {
+            const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
+            return `${name} (${p.organizationId})`;
+        }).join(', '));
     }
 
-    const dropdownHTML = '<option value="">Select Provider</option>' +
+    // Populate provider dropdown
+    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
         orgProviders.map(p => {
             const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
             return `<option value="${p.id}">${name}</option>`;
         }).join('');
-
-    console.log('📝 Setting provider dropdown HTML...');
-    console.log('   Options being set:', orgProviders.map(p => {
-        const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
-        return `${name} (${p.id})`;
-    }).join(', ') || 'None');
-
-    providerSelect.innerHTML = dropdownHTML;
-
-    console.log('✓ Dropdown innerHTML set. Verifying...');
-    console.log('   Actual options in dropdown:', providerSelect.options.length - 1, 'providers');
-    Array.from(providerSelect.options).forEach((opt, idx) => {
-        if (idx > 0) {
-            console.log(`      ${idx}. ${opt.text} (value: ${opt.value})`);
-        }
-    });
 
     // Only show payers that have contracts with current organization
     const orgPayerIds = currentOrganization ?
