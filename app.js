@@ -1,4 +1,11 @@
 // ProviderVault - Healthcare Credentialing System
+
+// Disable all console logging to prevent glitches
+const originalConsole = { log: console.log, warn: console.warn, error: console.error };
+console.log = function() {};
+console.warn = function() {};
+console.error = function() {};
+
 // Data storage
 let providers = [];
 let payers = [];
