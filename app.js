@@ -3398,22 +3398,27 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
-    // ✅ SIMPLIFIED LOGGING: Show filtering process
-    console.log('🔍 populateEnrollmentDropdowns() called for org:', currentOrganization ? currentOrganization.id : 'None');
-
     // Only show providers from current organization
     const orgProviders = currentOrganization ?
         providers.filter(p => p.organizationId === currentOrganization.id) :
         providers;
 
-    // Show summary
-    console.log(`   Filtered: ${orgProviders.length} of ${providers.length} providers`);
-    if (orgProviders.length > 0) {
-        console.log('   Providers:', orgProviders.map(p => {
-            const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
-            return `${name} (${p.organizationId})`;
-        }).join(', '));
-    }
+    // 🚨 DEBUG ALERT: Show filtering info directly in UI
+    const debugInfo = `
+FILTERING DEBUG:
+Current Org: ${currentOrganization ? currentOrganization.name + ' (' + currentOrganization.id + ')' : 'None'}
+Total Providers: ${providers.length}
+Filtered Providers: ${orgProviders.length}
+
+Providers being shown:
+${orgProviders.map(p => {
+    const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name;
+    return `- ${name} (ID: ${p.id}, OrgID: ${p.organizationId})`;
+}).join('\n')}
+    `.trim();
+
+    // Show alert with debug info
+    alert(debugInfo);
 
     // Populate provider dropdown
     providerSelect.innerHTML = '<option value="">Select Provider</option>' +
