@@ -283,13 +283,14 @@
                         </div>
                     </div>
 
-                    <!-- Recent Activity -->
+                    <!-- Recent Claims -->
                     <div class="widget-card">
                         <div class="widget-header">
-                            <h3>Recent Activity</h3>
+                            <h3>Recent Claims</h3>
+                            <button class="btn btn-secondary btn-small" onclick="showView('claims')" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">View All</button>
                         </div>
-                        <div class="activity-empty">
-                            <p>Activity tracking will appear here as you use the system.</p>
+                        <div id="recent-claims-widget">
+                            <p style="text-align: center; padding: 1.5rem; color: #94a3b8;">Loading claims...</p>
                         </div>
                     </div>
                 </div>
@@ -1516,6 +1517,6 @@
         </div>
     </div>
 
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=11"></script>
 </body>
 </html>
