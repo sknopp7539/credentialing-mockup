@@ -3285,23 +3285,55 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
-    // Only show providers from current organization
-    const orgProviders = currentOrganization ?
-        providers.filter(p => p.organizationId === currentOrganization.id) :
-        providers;
+    console.log('🔍 ========== POPULATE ENROLLMENT DROPDOWNS ==========');
+    console.log('🔍 Current Organization:', currentOrganization ? `${currentOrganization.name} (ID: ${currentOrganization.id})` : 'NULL');
+    console.log('🔍 Total providers in database:', providers.length);
 
-    providerSelect.innerHTML = '<option value="">Select Provider</option>' +
-        orgProviders.map(p => {
-            const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
-            return `<option value="${p.id}">${name}</option>`;
-        }).join('');
+    // Only show providers from current organization
+    // If no organization is selected, don't show any providers (security measure)
+    const orgProviders = currentOrganization ?
+        providers.filter(p => {
+            // Strict equality check to ensure organizationId matches
+            const matches = p.organizationId === currentOrganization.id;
+            if (!matches) {
+                console.log(`🔍 Filtering out provider ${p.id} (${p.firstName} ${p.lastName}): orgId=${p.organizationId} vs currentOrgId=${currentOrganization.id}`);
+            }
+            return matches;
+        }) :
+        [];  // Return empty array instead of all providers when no organization is selected
+
+    console.log('🔍 Filtered providers for current org:', orgProviders.length);
+    console.log('🔍 Provider details:', orgProviders.map(p => ({
+        id: p.id,
+        name: `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name,
+        organizationId: p.organizationId
+    })));
+
+    if (orgProviders.length === 0 && currentOrganization) {
+        providerSelect.innerHTML = '<option value="">No providers found for this organization</option>';
+        providerSelect.disabled = true;
+    } else if (!currentOrganization) {
+        providerSelect.innerHTML = '<option value="">Please select an organization first</option>';
+        providerSelect.disabled = true;
+    } else {
+        providerSelect.disabled = false;
+        providerSelect.innerHTML = '<option value="">Select Provider</option>' +
+            orgProviders.map(p => {
+                const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
+                return `<option value="${p.id}">${name}</option>`;
+            }).join('');
+    }
 
     // Only show payers that have contracts with current organization
+    // If no organization is selected, don't show any payers (security measure)
     const orgPayerIds = currentOrganization ?
         contracts.filter(c => c.organizationId === currentOrganization.id).map(c => c.payerId) :
-        payers.map(p => p.id);
+        [];  // Return empty array instead of all payers when no organization is selected
 
     const availablePayers = payers.filter(p => orgPayerIds.includes(p.id));
+
+    console.log('🔍 Contracts for current org:', currentOrganization ? contracts.filter(c => c.organizationId === currentOrganization.id).length : 0);
+    console.log('🔍 Available payers:', availablePayers.length);
 
     if (availablePayers.length === 0 && currentOrganization) {
         payerSelect.innerHTML = '<option value="">No payer contracts found for this organization</option>';
