@@ -956,21 +956,24 @@ function loadData() {
                 name: 'Blue Cross Blue Shield',
                 type: 'Commercial',
                 payerId: '12345',
-                status: 'Active'
+                status: 'Active',
+                organizationId: 'ORG-001'  // Metropolitan Healthcare Group
             },
             {
                 id: 'PAY-002',
                 name: 'Aetna',
                 type: 'Commercial',
                 payerId: '67890',
-                status: 'Active'
+                status: 'Active',
+                organizationId: 'ORG-001'  // Metropolitan Healthcare Group
             },
             {
                 id: 'PAY-003',
                 name: 'Medicare',
                 type: 'Medicare',
                 payerId: '00001',
-                status: 'Active'
+                status: 'Active',
+                organizationId: 'ORG-002'  // Coastal Medical Associates
             }
         ];
         savePayers();
