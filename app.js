@@ -3389,6 +3389,22 @@ function populateEnrollmentDropdowns() {
     const providerSelect = document.getElementById('enrollment-provider');
     const payerSelect = document.getElementById('enrollment-payer');
 
+    // Debug: Show what's happening with organization filtering
+    const debugInfo = {
+        currentOrg: currentOrganization ? `${currentOrganization.name} (${currentOrganization.id})` : 'NONE',
+        totalProviders: providers.length,
+        providersWithOrg: providers.filter(p => p.organizationId).length,
+        matchingProviders: currentOrganization ? providers.filter(p => p.organizationId === currentOrganization.id).length : providers.length
+    };
+    console.log('🔍 Enrollment Dropdown Debug:', debugInfo);
+
+    // Temporary alert for debugging - remove after fixing
+    if (currentOrganization && debugInfo.matchingProviders !== debugInfo.totalProviders) {
+        // This is expected - filtering is working
+    } else if (currentOrganization && debugInfo.matchingProviders === debugInfo.totalProviders) {
+        alert(`⚠️ DEBUG: All ${debugInfo.totalProviders} providers shown for ${currentOrganization.name}.\n\nThis may indicate a filtering issue. Check if all providers have organizationId = '${currentOrganization.id}'`);
+    }
+
     // Only show providers from current organization
     const orgProviders = currentOrganization ?
         providers.filter(p => p.organizationId === currentOrganization.id) :
@@ -3399,10 +3415,17 @@ function populateEnrollmentDropdowns() {
         console.warn(`⚠️ No providers found for ${currentOrganization.name}`);
     }
 
+    // Show organization indicator for debugging
+    const getOrgName = (orgId) => {
+        const org = organizations.find(o => o.id === orgId);
+        return org ? org.name : 'No Org';
+    };
+
     providerSelect.innerHTML = '<option value="">Select Provider</option>' +
         orgProviders.map(p => {
             const name = `${p.firstName || ''} ${p.lastName || ''}`.trim() || p.name || 'Unknown';
-            return `<option value="${p.id}">${name}</option>`;
+            const orgIndicator = p.organizationId ? ` [${getOrgName(p.organizationId)}]` : ' [NO ORG]';
+            return `<option value="${p.id}">${name}${orgIndicator}</option>`;
         }).join('');
 
     // Only show payers that have contracts with current organization
