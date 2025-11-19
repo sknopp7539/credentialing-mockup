@@ -41,6 +41,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadContracts();
     loadEmailNotifications();
     loadClaims();
+    
+    // Ensure dashboard is refreshed after all initialization completes
+    // This fixes the organization filtering display issue
+    setTimeout(() => {
+        if (currentUser && currentOrganization) {
+            const dashboardView = document.getElementById('dashboard-view');
+            if (dashboardView && dashboardView.classList.contains('active')) {
+                updateDashboard();
+            }
+        }
+    }, 100);
 });
 
 // ===== AUTHENTICATION =====
